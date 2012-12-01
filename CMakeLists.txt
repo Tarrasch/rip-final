@@ -23,8 +23,8 @@ LINK_DIRECTORIES( ${DART_LIBRARY_DIRS} )
 INCLUDE_DIRECTORIES( ${DART_INCLUDE_DIRS} )
 
 # Search all header and source files
-set ( rip_srcs  tabRipPlannerApp.cpp tabRipPlanner.cpp RRT.cpp PathPlanner.cpp JTQuickFind.cpp tabManipulation.cpp)
-set ( rip_hdrs  tabRipPlanner.h RRT.h PathPlanner.h JTQuickFind.h tabManipulation.h)
+set ( rip_srcs  tabRipPlannerApp.cpp tabRipPlanner.cpp RRT.cpp PathPlanner.cpp JTQuickFind.cpp)
+set ( rip_hdrs  tabRipPlanner.h RRT.h PathPlanner.h JTQuickFind.h)
 set ( kdtree_srcs kdtree/kdtree.c )
 set ( kdtree_hdrs kdtree/kdtree.h )
 
