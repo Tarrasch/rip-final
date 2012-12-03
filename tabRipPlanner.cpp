@@ -20,6 +20,7 @@
 #include <Tabs/AllTabs.h>
 #include <GRIPApp.h>
 #include "JTFollower/JTFollower.h" 
+#include "Thrower.h" 
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 
 /* Quick intro to adding tabs:
@@ -44,7 +45,9 @@ enum planTabEvents {
 	checkbox_beGreedy,
 	checkbox_useConnect,
 	checkbox_useSmooth,
-	slider_Time
+	slider_Time,
+  button_TestThrow
+
 };
 
 // sizer for whole tab
@@ -158,6 +161,11 @@ RipPlannerTab::RipPlannerTab( wxWindow *parent, const wxWindowID id,
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
     col3Sizer->Add( new wxButton(this, button_empty2, wxT("Empty 2")),
+		    0, // make horizontally unstretchable
+		    wxALL, // make border all around (implicit top alignment)
+		    1 ); // set border width to 1, so start buttons are close together
+    // HACK, try add throw button
+    col3Sizer->Add( new wxButton(this, button_TestThrow, wxT("Test Throw")),
 		    0, // make horizontally unstretchable
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
@@ -378,7 +386,25 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
       std::cout<<"(i) Printing...Implement me :)"<<std::endl;
     }
     break;
-  }
+
+  case button_TestThrow:
+    if ( mWorld != NULL ) {
+      robotics::Object* object = mWorld->getObject(mWorld->getNumObjects()-1); // TODO: This "constant" is totally arbitrary!!!
+      Thrower thrower(*mWorld, *object, mTimeText);
+
+      VectorXd pos, vel;
+      pos << 0.0, 0, 1; // x y z
+      vel << 0.5, 0.3, 0.6; // x y z (these are all random)
+      thrower.throwObject(pos, vel);
+      thrower.SetThrowTimeline();
+
+      std::cout << std::endl;
+    } else {
+      std::cout << "(!) World must be loaded!!!!!!!!!!!"<< std::endl;
+    }
+    break;
+
+  } // end of case
 }
 
 /**
