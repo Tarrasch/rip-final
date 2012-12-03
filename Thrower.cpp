@@ -9,6 +9,9 @@
 #include <GUI/GRIPFrame.h>
 #include <Tabs/GRIPTab.h>
 
+#define PRINT(x) std::cout << #x << " = " << x << std::endl;
+#define ECHO(x) std::cout << x << std::endl;
+
 using namespace std;
 using namespace Eigen;
 
@@ -20,11 +23,12 @@ Thrower::Thrower(robotics::World &_world, robotics::Object &_object, wxTextCtrl 
 // The effect of this method is that it will fill the path value
 void Thrower::throwObject(VectorXd pos, VectorXd vel) {
   objectPath = projectileMotion(pos, vel);
+  PRINT(objectPath.size());
 }
 
 void Thrower::SetThrowTimeline(){
     if( objectPath.size() == 0 ) {
-        cout << "--(!) Must create a nonempty plan before setting dimeline (!)--" << endl;
+        cout << "--(!) Must create a nonempty plan before setting timeline (!)--" << endl;
         return;
     }
 
@@ -40,6 +44,7 @@ void Thrower::SetThrowTimeline(){
 
     for( list<VectorXd>::iterator it = objectPath.begin(); it != objectPath.end(); it++ ) {
         VectorXd &pos = *it;
+		PRINT(pos);
         mObject.setPositionXYZ(pos[0], pos[1], pos[2]);
 				mObject.update();
         frame->AddWorld( &mWorld );

@@ -22,6 +22,8 @@
 #include "JTFollower/JTFollower.h" 
 #include "Thrower.h" 
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
+#define ECHO(x) std::cout << x << std::endl;
+
 
 /* Quick intro to adding tabs:
  * 1- Copy template cpp and header files and replace with new class name
@@ -388,15 +390,28 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
     break;
 
   case button_TestThrow:
+	ECHO("Test Throw Pressed");
+	
     if ( mWorld != NULL ) {
+	  ECHO("World is not NULL");
+	  
       robotics::Object* object = mWorld->getObject(mWorld->getNumObjects()-1); // TODO: This "constant" is totally arbitrary!!!
+	  
+	  PRINT(object->getName());
+	  
       Thrower thrower(*mWorld, *object, mTimeText);
-
+	  //ECHO("1");
       VectorXd pos, vel;
+	  //ECHO("2");
+	  pos.resize(3);
       pos << 0.0, 0, 1; // x y z
-      vel << 0.5, 0.3, 0.6; // x y z (these are all random)
-      thrower.throwObject(pos, vel);
-      thrower.SetThrowTimeline();
+      //ECHO("3");
+	  vel.resize(3);
+	  vel << 0.5, 0.3, 0.6; // Vx Vy Vz (these are all random)
+      //ECHO("4");
+	  thrower.throwObject(pos, vel);
+      //ECHO("5");
+	  thrower.SetThrowTimeline();
 
       std::cout << std::endl;
     } else {
