@@ -36,50 +36,48 @@
  *
  */	
 
-#ifndef _JT_QUICKFIND_H_
-#define _JT_QUICKFIND_H_
+#ifndef _JointMover_H_
+#define _JointMover_H_
 
 #include <iostream>
 #include <Eigen/Core>
 #include <vector>
 #include <robotics/World.h>
 
-class JTQuickFind {
+#define PRINT(x) std::cout << #x << " = " << x << std::endl;
+#define ECHO(x) std::cout << x << std::endl;
 
-public:
+using namespace std;
+using namespace Eigen;
 
+class JointMover {
+  private:
     /// Member variables
     double mConfigStep;
-    robotics::World *mWorld;
+    robotics::World &mWorld;
     int mRobotId;
-    Eigen::VectorXi mLinks;
+    VectorXi mLinks;
     double mWorkspaceThresh;
-    
+
     dynamics::BodyNodeDynamics *mEENode;
     int mEEId;
     int mMaxIter;
-    
-    JTQuickFind( robotics::World &_world,
-                double _configStep = 0.1 ); // 0.046 = 1_degree * sqrt(7)
-    
-    void init( int _robotId,
-	       const Eigen::VectorXi &_links,
-	       std::string _EEName,
-	       int _EEId,
-	       double _res );
-    
-    /// Destructor
-    ~JTQuickFind();
-    
-    Eigen::MatrixXd GetPseudoInvJac() ;
-    bool GoToXYZ( Eigen::VectorXd &_q, 
-		  Eigen::VectorXd _targetXYZ);
-		  
-    Eigen::VectorXd GetXYZ( Eigen::VectorXd _q );
-    
- private:
 
+    MatrixXd GetPseudoInvJac();
+
+  public:
+    JointMover( robotics::World &_world, int _robotId,
+        double _configStep = 0.1 ); // 0.046 = 1_degree * sqrt(7)
+
+    // Modifies q, true if could reach "in time". No actual movement!
+    bool GoToXYZ( VectorXd &_q, VectorXd _targetXYZ);
+
+    // Returns new configuration q. No actual movement!
+    VectorXd OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ);
+
+    // Returns the workspace coordinate for a jointspace coordinate
+    VectorXd GetXYZ( VectorXd _q );
 };
 
-#endif /** _JT_QUICKFIND_H_ */
+#endif
 

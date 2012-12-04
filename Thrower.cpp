@@ -8,6 +8,7 @@
 #include <GUI/GRIPSlider.h>
 #include <GUI/GRIPFrame.h>
 #include <Tabs/GRIPTab.h>
+#include "JointMover.h"
 
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
@@ -24,6 +25,13 @@ Thrower::Thrower(robotics::World &_world, robotics::Object &_object, wxTextCtrl 
 void Thrower::throwObject(VectorXd pos, VectorXd vel) {
   objectPath = projectileMotion(pos, vel);
   PRINT(objectPath.size());
+  JointMover arm(mWorld, 0); // TODO: repalce 0 with mRobotId
+  jointPath.clear();
+  VectorXd joints(6, 0.0); // Create 6 elements with 0.0, there are 6 joints I THINK
+  for( list<VectorXd>::iterator it = objectPath.begin(); it != objectPath.end(); it++ ) {
+    jointPath.push_back(joints);
+    joints = arm.OneStepTowardsXYZ(*it, joints);
+  }
 }
 
 void Thrower::SetThrowTimeline(){
@@ -42,11 +50,18 @@ void Thrower::SetThrowTimeline(){
 
     frame->InitTimer( string("Throwing of object"),increment );
 
-    for( list<VectorXd>::iterator it = objectPath.begin(); it != objectPath.end(); it++ ) {
+    list<VectorXd>::iterator it_j;
+    for( list<VectorXd>::iterator it = objectPath.begin(),
+         it_j = jointPath.begin();
+         it != objectPath.end();
+         it++, it_j++ ) {
         VectorXd &pos = *it;
-		PRINT(pos);
+        PRINT(pos);
+        PRINT(*it_j);
         mObject.setPositionXYZ(pos[0], pos[1], pos[2]);
 				mObject.update();
+        mWorld.getRobot(0)->setQuickDofs( *it_j ); // TODO: repalce 0 with mRobotId
+				mWorld.getRobot(0)->update();// TODO: repalce 0 with mRobotId
         frame->AddWorld( &mWorld );
     }
 

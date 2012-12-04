@@ -27,6 +27,7 @@ public:
     wxTextCtrl *mTimeText;
 
     std::list<Eigen::VectorXd> objectPath; // Path of object
+    std::list<Eigen::VectorXd> jointPath; // Path of object
 
     Thrower(robotics::World &_world, robotics::Object &_object, wxTextCtrl *_timeText);
 
