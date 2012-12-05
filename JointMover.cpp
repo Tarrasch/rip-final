@@ -55,6 +55,8 @@ MatrixXd JointMover::GetPseudoInvJac() {
 
 VectorXd JointMover::OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ) {
   ECHO("  BEGIN OneStepTowardsXYZ");
+  assert(_targetXYZ.size() == 3);
+  assert(_q.size() > 3);
   VectorXd dXYZ = _targetXYZ - GetXYZ(_q); // GetXYZ also updates the config to _q, so Jaclin use an updated value
   VectorXd dConfig = GetPseudoInvJac()*dXYZ;
 
