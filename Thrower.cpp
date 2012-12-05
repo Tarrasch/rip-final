@@ -60,9 +60,9 @@ void Thrower::SetThrowTimeline(){
         PRINT(pos);
         PRINT(*it_j);
         mObject.setPositionXYZ(pos[0], pos[1], pos[2]);
-				mObject.update();
+        mObject.update();
         mWorld.getRobot(mRobotId)->setQuickDofs( *it_j );
-				mWorld.getRobot(mRobotId)->update();
+        mWorld.getRobot(mRobotId)->update();
         frame->AddWorld( &mWorld );
     }
 
