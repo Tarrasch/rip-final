@@ -25,11 +25,15 @@ JointMover::JointMover( robotics::World &_world, int _robotId, double _configSte
 
   mLinks = mWorld.getRobot(mRobotId)->getQuickDofsIndices();
   //get data to initialize
+  
   int mNumLinks = mWorld.getRobot(mRobotId)->getNumQuickDofs(); 
-  int EEDofId = mLinks( mNumLinks - 1 ); // TODO: use [] instead?
+  PRINT(mLinks.size());
+  mLinks.resize(mNumLinks);
+  PRINT(mLinks.size());
+  int EEDofId = mLinks( mNumLinks -1); // TODO: use [] instead?
   mEEId = mWorld.getRobot(mRobotId)->getDof( EEDofId )->getJoint()->getChildNode()->getSkelIndex();
   std::string mEEName =  mWorld.getRobot(mRobotId)->getNode(mEEId)->getName();
-
+  
   //init goal_finder
   mMaxIter = 1000;
   mWorkspaceThresh = 0.02; // An error of half the resolution // dunno why 0.02
@@ -49,7 +53,7 @@ MatrixXd JointMover::GetPseudoInvJac() {
   return Jt;
 }
 
-VectorXd JointMover::OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ) {
+VectorXd JointMover::OneStepTowardsXYZ( VectorXd _targetXYZ, VectorXd _q) {//ERROR WAS HERE: parameters were switched
   ECHO("  BEGIN OneStepTowardsXYZ");
   VectorXd dXYZ = _targetXYZ - GetXYZ(_q); // GetXYZ also updates the config to _q, so Jaclin use an updated value
   VectorXd dConfig = GetPseudoInvJac()*dXYZ;
@@ -80,12 +84,13 @@ bool JointMover::GoToXYZ( VectorXd &_q, VectorXd _targetXYZ) {
 
 VectorXd JointMover::GetXYZ( VectorXd _q ) {
   // Get current XYZ position
-  mWorld.getRobot(mRobotId)->setDofs( _q, mLinks );
+
+  mWorld.getRobot(mRobotId)->setDofs(_q, mLinks );
   mWorld.getRobot(mRobotId)->update();
-  
+
   MatrixXd qTransform = mEENode->getWorldTransform();
   VectorXd qXYZ(3); qXYZ << qTransform(0,3), qTransform(1,3), qTransform(2,3);
-  
+
   return qXYZ;
 }
- 
+
