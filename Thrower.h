@@ -18,6 +18,7 @@ using namespace Eigen;
 class Thrower {
 
 public:
+    const int mRobotId;
 
     /// Member variables
     robotics::World &mWorld;  // The world
