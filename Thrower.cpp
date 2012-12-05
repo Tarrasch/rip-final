@@ -31,7 +31,7 @@ void Thrower::throwObject(VectorXd pos, VectorXd vel) {
   PRINT(joints.size());
   for( list<VectorXd>::iterator it = objectPath.begin(); it != objectPath.end(); it++ ) {
     jointPath.push_back(joints);
-    joints = arm.OneStepTowardsXYZ(*it, joints);
+    joints = arm.OneStepTowardsXYZ(joints, *it);
   }
 }
 

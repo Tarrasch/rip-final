@@ -53,7 +53,7 @@ MatrixXd JointMover::GetPseudoInvJac() {
   return Jt;
 }
 
-VectorXd JointMover::OneStepTowardsXYZ( VectorXd _targetXYZ, VectorXd _q) {//ERROR WAS HERE: parameters were switched
+VectorXd JointMover::OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ) {
   ECHO("  BEGIN OneStepTowardsXYZ");
   VectorXd dXYZ = _targetXYZ - GetXYZ(_q); // GetXYZ also updates the config to _q, so Jaclin use an updated value
   VectorXd dConfig = GetPseudoInvJac()*dXYZ;
