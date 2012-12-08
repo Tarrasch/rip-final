@@ -393,28 +393,24 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
 	ECHO("Test Throw Pressed");
 	
     if ( mWorld != NULL ) {
-	  ECHO("World is not NULL");
-	  
-      robotics::Object* object = mWorld->getObject(mWorld->getNumObjects()-1); // TODO: This "constant" is totally arbitrary!!!
-	  
-	  PRINT(object->getName());
-	  
-      Thrower thrower(*mWorld, *object, mTimeText);
-	  //ECHO("1");
-      VectorXd pos, vel;
-	  //ECHO("2");
-	  pos.resize(3);
-      //TODO: create random position and velocity generator
-      pos << 0.0, 0, 1; // x y z
-      //ECHO("3");
-	  vel.resize(3);
-	  vel << 0.5, 0.3, 0.6; // Vx Vy Vz (these are all random)
-      //ECHO("4");
-	  thrower.throwObject(pos, vel);
-      //ECHO("5");
-	  thrower.SetThrowTimeline();
-
-      std::cout << std::endl;
+	ECHO("World is not NULL");
+        robotics::Object* object = mWorld->getObject(mWorld->getNumObjects()-1); // TODO: This "constant" is totally arbitrary!!!
+        Thrower thrower(*mWorld, *object, mTimeText);
+        
+        //find robot position to determine direction of object
+        VectorXd robotPos(3), vel(3);
+        //get current robot position
+        double x,y,z;
+        mWorld->getRobot(mRobotId)->getPositionXYZ(x,y,z);
+        robotPos << x, y, z;
+        
+        vel << 1.0, 0.3, 0.6;
+        //the target position will be a random location reachable by the robot arm
+        //velocities are calculated to reach such position
+        thrower.throwObject(robotPos, vel);
+        thrower.SetThrowTimeline();
+        
+        std::cout << std::endl;
     } else {
       std::cout << "(!) World must be loaded!!!!!!!!!!!"<< std::endl;
     }

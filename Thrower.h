@@ -10,8 +10,6 @@
 #include <robotics/World.h>
 #include <wx/wx.h>
 
-#define PRINT(x) std::cout << #x << " = " << x << std::endl;
-
 using namespace std;
 using namespace Eigen;
 
@@ -33,8 +31,11 @@ public:
     Thrower(robotics::World &_world, robotics::Object &_object, wxTextCtrl *_timeText);
 
     void throwObject(VectorXd pos, VectorXd vel);
-
+       
     void SetThrowTimeline();
+    
+    VectorXd findRandomReachablePosition(VectorXd pos);
+    VectorXd findRandomStartPosition(VectorXd pos);
 };
 #endif
 

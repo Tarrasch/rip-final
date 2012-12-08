@@ -27,9 +27,8 @@ JointMover::JointMover( robotics::World &_world, int _robotId, double _configSte
   //get data to initialize
   
   int mNumLinks = mWorld.getRobot(mRobotId)->getNumQuickDofs(); 
-  PRINT(mLinks.size());
   mLinks.resize(mNumLinks);
-  PRINT(mLinks.size());
+
   int EEDofId = mLinks( mNumLinks -1); // TODO: use [] instead?
   mEEId = mWorld.getRobot(mRobotId)->getDof( EEDofId )->getJoint()->getChildNode()->getSkelIndex();
   std::string mEEName =  mWorld.getRobot(mRobotId)->getNode(mEEId)->getName();
