@@ -26,9 +26,10 @@ public:
     /// Copy of gui stuff
     wxTextCtrl *mTimeText;
 
-    std::list<Eigen::VectorXd> objectPath; // Path of object
-    std::list<Eigen::VectorXd> predictedPath;
-    std::list<Eigen::VectorXd> jointPath; // Path of object
+    list<VectorXd> objectPath; // Path of object
+    list<VectorXd> predictedPath;
+    list< list<VectorXd> > predictedPaths;
+    list<VectorXd> jointPath; // Path of object
 
     Thrower(robotics::World &_world, wxTextCtrl *_timeText,
         robotics::Object &_sphereActual, robotics::Object &_spherePredicted);

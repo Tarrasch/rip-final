@@ -52,14 +52,23 @@ void Thrower::throwObject(VectorXd pos) {
   
   //calculate motion in steps
   //objectPath = projectileMotion(rstart, vels, );
+  predictedPath.clear();
+  predictedPaths.clear();
   objectPath = projectileMotion(rstart, vel, acc);
-  list<VectorXd> smallObjectPath;
-  list<VectorXd>::iterator it = objectPath.begin();
-  for(int i = 0; i < objectPath.size()/2-5; i++, it++){
-    smallObjectPath.push_back(*it);
+  for(list<VectorXd>::iterator it = objectPath.begin(); it != objectPath.end(); it++){
+    list<VectorXd>::iterator it_after = it;
+    it_after++;
+    LinearPredictor predictor(list<VectorXd>(objectPath.begin(), it_after));
+    predictedPaths.push_back(predictor.getPredictedPath());
+    predictedPath.push_back(predictedPaths.back().back());
   }
-  LinearPredictor predictor(smallObjectPath);
-  predictedPath = predictor.getPredictedPath();
+  /* list<VectorXd> smallObjectPath; */
+  /* list<VectorXd>::iterator it = objectPath.begin(); */
+  /* for(int i = 0; i < objectPath.size()/2-5; i++, it++){ */
+  /*   smallObjectPath.push_back(*it); */
+  /* } */
+  /* LinearPredictor predictor(smallObjectPath); */
+  /* predictedPath = predictor.getPredictedPath(); */
 
   JointMover arm(mWorld, mRobotId);
   jointPath.clear();

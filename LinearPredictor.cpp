@@ -14,10 +14,13 @@ using namespace std;
 using namespace Eigen;
 
 LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath){
+        assert(observedPath.size() > 0);
         VectorXd last = observedPath.back();
         list<VectorXd>::iterator it = observedPath.end();
         it--;
-        it--;
+        if(it != observedPath.begin()) { // In case we only have one single element!
+          it--;
+        }
         VectorXd beforeLast = *it;
         
         PRINT(last);
