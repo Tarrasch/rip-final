@@ -50,7 +50,7 @@ void Thrower::throwObject(VectorXd pos) {
   objectPath = straightMotion(rstart, rrp);
   list<VectorXd> smallObjectPath;
   list<VectorXd>::iterator it = objectPath.begin();
-  for(int i = 0; i < objectPath.size()/2-5; i++){
+  for(int i = 0; i < objectPath.size()/2-5; i++, it++){
     smallObjectPath.push_back(*it);
   }
   LinearPredictor predictor(smallObjectPath);
@@ -128,10 +128,11 @@ void Thrower::SetThrowTimeline(){
          it++, it_j++, it_pred++ ) {
         VectorXd &pos = *it;
         VectorXd &pos_pred = *it_pred;
-        PRINT(pos);
-        PRINT(*it_j);
+        //PRINT(pos);
+        //PRINT(*it_j);
         mSphereActual.setPositionXYZ(pos[0], pos[1], pos[2]);
         mSphereActual.update();
+        
         mSpherePredicted.setPositionXYZ(pos_pred[0], pos_pred[1], pos_pred[2]);
         mSpherePredicted.update();
         mWorld.getRobot(mRobotId)->setQuickDofs( *it_j );

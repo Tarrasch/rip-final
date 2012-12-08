@@ -6,11 +6,6 @@
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
 
-const double g = (-9.82/10.0);
-const double pg = -g;
-const double PI = 3.1415925;
-const double dt = 0.05;
-
 std::list< VectorXd > projectileMotion(VectorXd pos, VectorXd vel, VectorXd acc){
         ECHO("START Projectile Motion");
         std::list<VectorXd> res;
@@ -60,6 +55,7 @@ std::list< VectorXd > projectileMotionWRand(VectorXd pos, VectorXd vel, VectorXd
 }
 
 std::list< VectorXd > straightMotion(VectorXd startpos, VectorXd endpos){
+        ECHO("START Straight Motion");
         double t = 1;
         VectorXd dir = endpos - startpos;
         double distance = dir.norm();
@@ -73,11 +69,12 @@ std::list< VectorXd > straightMotion(VectorXd startpos, VectorXd endpos){
                 pos += vel*dt;
                 
         } while ((pos-startpos).norm() < distance);
+        ECHO("END Straight Motion");
         return res;
 }
 
-std::list< VectorXd > projectileMotionWRandT(VectorXd pos, VectorXd vel, VectorXd acc, int randMaxAcc, int maxTime){
-	ECHO("START Random Projectile Motion"); 
+std::list< VectorXd > projectileMotionWRandT(VectorXd pos, VectorXd vel, VectorXd acc, int randMaxAcc, double maxTime){
+	ECHO("START Random Projectile Motion with Time"); 
 	
 	// initialize random seed
 	srand ( time(NULL) );					
@@ -86,7 +83,7 @@ std::list< VectorXd > projectileMotionWRandT(VectorXd pos, VectorXd vel, VectorX
 	std::list<VectorXd> res;		
 
 	// Build a counter to calculate the amount of "time" that has passed
-	int t = 0;
+	double t = 0;
 	do {
 		// Push the current position to the final path list
 		res.push_back(pos);
@@ -106,6 +103,7 @@ std::list< VectorXd > projectileMotionWRandT(VectorXd pos, VectorXd vel, VectorX
 		// Generate a new position for the path
 		pos += vel*dt + tempAcc*dt*dt/2.0;
 		
+		PRINT(pos)
 		// Generate a new velocity for the next point on the path
 		vel += tempAcc*dt;
 		

@@ -13,8 +13,7 @@
 using namespace std;
 using namespace Eigen;
 
-LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath) :
-  Predictor(observedPath) {
+LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath){
         VectorXd last = observedPath.back();
         list<VectorXd>::iterator it = observedPath.end();
         it--;
@@ -25,9 +24,9 @@ LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath) :
         PRINT(beforeLast);
         
         //call projectileMotionWRandT with no randomness
-        VectorXd vel = (last - beforeLast);
+        VectorXd vel = (last - beforeLast)/dt;
         VectorXd acc(3); acc<<0,0,0;
-        predictedPath = projectileMotionWRandT(beforeLast, vel, acc, 0, 4);
+        predictedPath = projectileMotionWRandT(beforeLast, vel, acc, 0, 5.0);
 }
 
 std::list<Eigen::VectorXd> LinearPredictor::getPredictedPath(){
