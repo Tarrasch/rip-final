@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012, Georgia Tech Research Corporation
- * All rights reserved	
+ * All rights reserved
  * Author(s): Ana C. Huaman Quispe (modified by Juan C. Garcia) <ahuaman3@gatech.edu>
  * Georgia Tech Humanoid Robotics Lab
  * Under direction of Prof. Mike Stilman <mstilman@cc.gatech.edu>

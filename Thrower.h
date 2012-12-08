@@ -20,7 +20,8 @@ public:
 
     /// Member variables
     robotics::World &mWorld;  // The world
-    robotics::Object &mObject; // The object (aka the trash) we throw
+    robotics::Object &mSphereActual; // The object (aka the trash) we throw
+    robotics::Object &mSpherePredicted; // The object (aka the trash) we throw
 
     /// Copy of gui stuff
     wxTextCtrl *mTimeText;
@@ -28,7 +29,8 @@ public:
     std::list<Eigen::VectorXd> objectPath; // Path of object
     std::list<Eigen::VectorXd> jointPath; // Path of object
 
-    Thrower(robotics::World &_world, robotics::Object &_object, wxTextCtrl *_timeText);
+    Thrower(robotics::World &_world, wxTextCtrl *_timeText,
+        robotics::Object &_sphereActual, robotics::Object &_spherePredicted);
 
     void throwObject(VectorXd pos);
        
