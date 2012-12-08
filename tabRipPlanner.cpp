@@ -404,6 +404,7 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
       VectorXd pos, vel;
 	  //ECHO("2");
 	  pos.resize(3);
+      //TODO: create random position and velocity generator
       pos << 0.0, 0, 1; // x y z
       //ECHO("3");
 	  vel.resize(3);

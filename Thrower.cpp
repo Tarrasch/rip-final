@@ -27,7 +27,7 @@ void Thrower::throwObject(VectorXd pos, VectorXd vel) {
   PRINT(objectPath.size());
   JointMover arm(mWorld, 0); // TODO: repalce 0 with mRobotId
   jointPath.clear();
-  VectorXd joints = mWorld.getRobot(0)->getQuickDofs(); // Create 6 elements with 0.0, there are 6 joints I THINK
+  VectorXd joints = mWorld.getRobot(0)->getQuickDofs();
   PRINT(joints.size());
   for( list<VectorXd>::iterator it = objectPath.begin(); it != objectPath.end(); it++ ) {
     jointPath.push_back(joints);
