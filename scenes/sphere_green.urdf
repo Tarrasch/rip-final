@@ -1,20 +1,22 @@
-<!-- sphere_green.urdf -->
+<!-- brick.urdf -->
 
 <object name="sphere_green">
-	<!-- Link 0 -->
-	<link name="base_link">
-		<visual>
-			<geometry>
-				<cylinder length="1" radius="1"/>
-			</geometry>
-			<material name="blue">
-				<color rgba="0 0 .8 1"/>
-			</material>
-		</visual>
-		<collision>
-			<geometry>
-				<cylinder length="0.6" radius="0.2"/>
-			</geometry>
-		</collision>
-	  </link>
+  <!-- Link 0 -->
+  <link name="link_0">
+    <inertial>
+      <mass value="1"/>         <!-- .5 kilogram mass -->
+      <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/> <!--no idea what identity for inertia matrix measn-->
+      <origin xyz="0 0 0"/>     <!--and origin hopefull at teh center of the block-->
+    </inertial>
+    <collision>
+      <geometry>
+        <mesh filename="objects/sphere_green_mini.3ds"/>
+      </geometry>
+    </collision>
+    <visual>
+      <geometry>
+        <mesh filename="objects/sphere_green_mini.3ds"/>
+      </geometry>
+    </visual>
+  </link>
 </object>

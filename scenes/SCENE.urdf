@@ -8,7 +8,7 @@
 <include filename="lamp3.urdf" model_name="lamp3"/>
 <include filename="polarbear.urdf" model_name="polarbear"/>
 <include filename="sphere_red.urdf" model_name="sphere_red"/>
-
+<include filename="sphere_blue.urdf" model_name="sphere_green"/>
 <!-- Construct the world -->
 <entity model="schunk_arm" name="SchunkArm">
 	<origin xyz="-0.132 1.316 0.721" rpy="-1.57 1.57 0"/>
@@ -41,5 +41,9 @@
 
 <entity model="sphere_red" name="sphere 1">
 	<origin xyz="0 3 1" rpy="0 0 0"/>
+</entity>
+
+<entity model="sphere_green" name="sphere 2">
+	<origin xyz="0 6 1" rpy="0 0 0"/>
 </entity>
 </world> 

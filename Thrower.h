@@ -30,7 +30,7 @@ public:
 
     Thrower(robotics::World &_world, robotics::Object &_object, wxTextCtrl *_timeText);
 
-    void throwObject(VectorXd pos, VectorXd vel);
+    void throwObject(VectorXd pos);
        
     void SetThrowTimeline();
     

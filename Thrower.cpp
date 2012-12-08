@@ -23,7 +23,7 @@ Thrower::Thrower(robotics::World &_world, robotics::Object &_object, wxTextCtrl 
 }
 
 // The effect of this method is that it will fill the path value
-void Thrower::throwObject(VectorXd pos, VectorXd vel) {
+void Thrower::throwObject(VectorXd pos) {
   VectorXd shift(3);
   shift << 0, 10, 0;
   

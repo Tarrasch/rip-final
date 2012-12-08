@@ -398,16 +398,15 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
         Thrower thrower(*mWorld, *object, mTimeText);
         
         //find robot position to determine direction of object
-        VectorXd robotPos(3), vel(3);
+        VectorXd robotPos(3);
         //get current robot position
         double x,y,z;
         mWorld->getRobot(mRobotId)->getPositionXYZ(x,y,z);
         robotPos << x, y, z;
-        
-        vel << 1.0, 0.3, 0.6;
+
         //the target position will be a random location reachable by the robot arm
         //velocities are calculated to reach such position
-        thrower.throwObject(robotPos, vel);
+        thrower.throwObject(robotPos);
         thrower.SetThrowTimeline();
         
         std::cout << std::endl;
