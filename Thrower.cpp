@@ -9,6 +9,8 @@
 #include <GUI/GRIPFrame.h>
 #include <Tabs/GRIPTab.h>
 #include "JointMover.h"
+#include "LinearPredictor.h"
+#include "Predictor.h"
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
 #define ARM_LENGTH 1.10
@@ -46,6 +48,14 @@ void Thrower::throwObject(VectorXd pos) {
   //calculate motion in steps
   //objectPath = projectileMotion(rstart, vels, );
   objectPath = straightMotion(rstart, rrp);
+  list<VectorXd> smallObjectPath;
+  list<VectorXd>::iterator it = objectPath.begin();
+  for(int i = 0; i < objectPath.size()/2-5; i++){
+    smallObjectPath.push_back(*it);
+  }
+  LinearPredictor predictor(smallObjectPath);
+  predictedPath = predictor.getPredictedPath();
+
   JointMover arm(mWorld, mRobotId);
   jointPath.clear();
   VectorXd joints = mWorld.getRobot(0)->getQuickDofs();
@@ -107,15 +117,23 @@ void Thrower::SetThrowTimeline(){
     frame->InitTimer( string("Throwing of object"),increment );
 
     list<VectorXd>::iterator it_j;
+    list<VectorXd>::iterator it_pred;
     for( list<VectorXd>::iterator it = objectPath.begin(),
-         it_j = jointPath.begin();
-         it != objectPath.end();
-         it++, it_j++ ) {
+         it_j = jointPath.begin(),
+         it_pred = predictedPath.begin()
+         ;
+         it != objectPath.end() &&
+         it_pred != predictedPath.end()
+         ;
+         it++, it_j++, it_pred++ ) {
         VectorXd &pos = *it;
+        VectorXd &pos_pred = *it_pred;
         PRINT(pos);
         PRINT(*it_j);
         mSphereActual.setPositionXYZ(pos[0], pos[1], pos[2]);
         mSphereActual.update();
+        mSpherePredicted.setPositionXYZ(pos_pred[0], pos_pred[1], pos_pred[2]);
+        mSpherePredicted.update();
         mWorld.getRobot(mRobotId)->setQuickDofs( *it_j );
         mWorld.getRobot(mRobotId)->update();
         frame->AddWorld( &mWorld );

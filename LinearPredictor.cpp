@@ -18,6 +18,7 @@ LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath) :
         VectorXd last = observedPath.back();
         list<VectorXd>::iterator it = observedPath.end();
         it--;
+        it--;
         VectorXd beforeLast = *it;
         
         PRINT(last);

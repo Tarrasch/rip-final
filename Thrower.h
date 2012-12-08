@@ -27,15 +27,15 @@ public:
     wxTextCtrl *mTimeText;
 
     std::list<Eigen::VectorXd> objectPath; // Path of object
+    std::list<Eigen::VectorXd> predictedPath;
     std::list<Eigen::VectorXd> jointPath; // Path of object
 
     Thrower(robotics::World &_world, wxTextCtrl *_timeText,
         robotics::Object &_sphereActual, robotics::Object &_spherePredicted);
 
     void throwObject(VectorXd pos);
-       
     void SetThrowTimeline();
-    
+
     VectorXd findRandomReachablePosition(VectorXd pos);
     VectorXd findRandomStartPosition(VectorXd pos);
 };

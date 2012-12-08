@@ -17,10 +17,10 @@ using namespace Eigen;
 class Predictor {
 
 public:
-    Predictor(std::list<Eigen::VectorXd> observedPath);
+    Predictor(std::list<Eigen::VectorXd> observedPath){};
 
     virtual std::list<Eigen::VectorXd> getPredictedPath() = 0;
-    virtual ~Predictor();
+    virtual ~Predictor(){};
 };
 
 #endif

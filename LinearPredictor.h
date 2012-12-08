@@ -22,7 +22,7 @@ private:
 public:
     LinearPredictor(std::list<Eigen::VectorXd> observedPath);
     virtual std::list<Eigen::VectorXd> getPredictedPath();
-    virtual ~LinearPredictor();
+    virtual ~LinearPredictor(){};
 };
 
 #endif
