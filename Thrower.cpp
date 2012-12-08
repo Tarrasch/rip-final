@@ -44,6 +44,7 @@ void Thrower::throwObject(VectorXd pos) {
   //calculate motion in steps
   //objectPath = projectileMotion(rstart, vels, );
   objectPath = straightMotion(rstart, rrp);
+  
   JointMover arm(mWorld, mRobotId);
   jointPath.clear();
   VectorXd joints = mWorld.getRobot(0)->getQuickDofs();

@@ -32,37 +32,5 @@ std::list<Eigen::VectorXd> LinearPredictor::getPredictedPath(){
         return predictedPath;
 }
 
-void LinearPredictor::SetPredictorTimeline(){
-    if( predictedPath.size() == 0 ) {
-        cout << "--(!) Must create a nonempty plan before setting timeline (!)--" << endl;
-        return;
-    }
-
-    double T;
-    mTimeText->GetValue().ToDouble(&T);
-
-    int numsteps = objectPath.size();
-    double increment = T/(double)numsteps;
-    cout << "-->(+) Updating Timeline - Increment: " << increment
-         << " Total T: " << T << " Steps: " << numsteps << endl;
-
-    frame->InitTimer( string("Throwing of object"),increment );
-
-    list<VectorXd>::iterator it_j;
-    for( list<VectorXd>::iterator it = objectPath.begin(),
-         it_j = jointPath.begin();
-         it != objectPath.end();
-         it++, it_j++ ) {
-        VectorXd &pos = *it;
-        PRINT(pos);
-        PRINT(*it_j);
-        mObject.setPositionXYZ(pos[0], pos[1], pos[2]);
-        mObject.update();
-        mWorld.getRobot(mRobotId)->setQuickDofs( *it_j );
-        mWorld.getRobot(mRobotId)->update();
-        frame->AddWorld( &mWorld );
-    }
-}
-
 
 

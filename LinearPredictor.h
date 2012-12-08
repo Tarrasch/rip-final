@@ -22,7 +22,6 @@ public:
     LinearPredictor(std::list<Eigen::VectorXd> observedPath);
     
     std::list<Eigen::VectorXd> getPredictedPath();
-    void LinearPredictor::SetPredictorTimeline();
 };
 
 #endif
