@@ -10,6 +10,7 @@
 #include <robotics/World.h>
 #include <wx/wx.h>
 #include "newtonianPhysics.h"
+#include "Predictor.h"
 
 using namespace std;
 using namespace Eigen;
@@ -18,11 +19,10 @@ class LinearPredictor : public Predictor {
 
 private:
     std::list<Eigen::VectorXd> predictedPath;
-public:       
+public:
     LinearPredictor(std::list<Eigen::VectorXd> observedPath);
-    
-    std::list<Eigen::VectorXd> getPredictedPath();
-    void LinearPredictor::SetPredictorTimeline();
+    virtual std::list<Eigen::VectorXd> getPredictedPath();
+    virtual ~LinearPredictor();
 };
 
 #endif

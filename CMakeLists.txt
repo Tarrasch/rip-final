@@ -26,7 +26,7 @@ INCLUDE_DIRECTORIES( ${DART_INCLUDE_DIRS} )
 set ( rip_srcs  tabRipPlannerApp.cpp tabRipPlanner.cpp RRT.cpp PathPlanner.cpp
   JointMover.cpp newtonianPhysics.cpp Thrower.cpp LinearPredictor.cpp)
 set ( rip_hdrs  tabRipPlanner.h RRT.h PathPlanner.h JointMover.h
-  newtonianPhysics.h Thrower.h LinearPredictor.h)
+  newtonianPhysics.h Thrower.h LinearPredictor.h Predictor.h)
 set ( kdtree_srcs kdtree/kdtree.c )
 set ( kdtree_hdrs kdtree/kdtree.h )
 
