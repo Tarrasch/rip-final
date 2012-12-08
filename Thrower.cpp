@@ -45,9 +45,14 @@ void Thrower::throwObject(VectorXd pos) {
   //VectorXd vels = calculateVelocities(rstart, rrp);
   //PRINT(vels);
   
+  VectorXd vel(3);
+  vel << 0, 0.6, 0.8; 
+  VectorXd acc(3);
+  acc << 0, 0, g; 
+  
   //calculate motion in steps
   //objectPath = projectileMotion(rstart, vels, );
-  objectPath = straightMotion(rstart, rrp);
+  objectPath = projectileMotion(rstart, vel, acc);
   list<VectorXd> smallObjectPath;
   list<VectorXd>::iterator it = objectPath.begin();
   for(int i = 0; i < objectPath.size()/2-5; i++, it++){
