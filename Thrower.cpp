@@ -20,9 +20,10 @@ using namespace std;
 using namespace Eigen;
 
 Thrower::Thrower(robotics::World &_world, wxTextCtrl *_timeText,
-    robotics::Object &_sphereActual, robotics::Object &_spherePredicted ) :
+    robotics::Object &_sphereActual, robotics::Object &_spherePredicted, robotics::Object &_aimObject) :
   mWorld(_world), mTimeText(_timeText), mRobotId(0),
-  mSphereActual(_sphereActual), mSpherePredicted(_spherePredicted) {
+  mSphereActual(_sphereActual), mSpherePredicted(_spherePredicted),
+  mAimObject(_aimObject){
   // TODO: mRobotId shouldn't be fixed 0, rather a parameter
 }
 
@@ -52,6 +53,7 @@ void Thrower::throwObject(VectorXd pos) {
   
   //calculate motion in steps
   //objectPath = projectileMotion(rstart, vels, );
+  aims.clear();
   predictedPath.clear();
   predictedPaths.clear();
   objectPath = projectileMotion(rstart, vel, acc);
@@ -86,6 +88,7 @@ void Thrower::throwObject(VectorXd pos) {
     }
     jointPath.push_back(joints);
     joints = arm.OneStepTowardsXYZ(joints, closest);
+    aims.push_back(closest);
   }
 }
 
@@ -141,16 +144,19 @@ void Thrower::SetThrowTimeline(){
 
     list<VectorXd>::iterator it_j;
     list<VectorXd>::iterator it_pred;
+    list<VectorXd>::iterator it_aim;
     for( list<VectorXd>::iterator it = objectPath.begin(),
          it_j = jointPath.begin(),
-         it_pred = predictedPath.begin()
+         it_pred = predictedPath.begin(),
+         it_aim = aims.begin()
          ;
          it != objectPath.end() &&
          it_pred != predictedPath.end()
          ;
-         it++, it_j++, it_pred++ ) {
+         it++, it_j++, it_pred++, it_aim++ ) {
         VectorXd &pos = *it;
         VectorXd &pos_pred = *it_pred;
+        VectorXd &pos_aim = *it_aim;
         //PRINT(pos);
         //PRINT(*it_j);
         mSphereActual.setPositionXYZ(pos[0], pos[1], pos[2]);
@@ -158,6 +164,8 @@ void Thrower::SetThrowTimeline(){
         
         mSpherePredicted.setPositionXYZ(pos_pred[0], pos_pred[1], pos_pred[2]);
         mSpherePredicted.update();
+        mAimObject.setPositionXYZ(pos_aim[0], pos_aim[1], pos_aim[2]);
+        mAimObject.update();
         mWorld.getRobot(mRobotId)->setQuickDofs( *it_j );
         mWorld.getRobot(mRobotId)->update();
         frame->AddWorld( &mWorld );

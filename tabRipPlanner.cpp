@@ -394,9 +394,10 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
 	
     if ( mWorld != NULL ) {
 	ECHO("World is not NULL");
-        robotics::Object* sphere_red  = mWorld->getObject(mWorld->getNumObjects()-2); // TODO: This "constant" is totally arbitrary!!!
-        robotics::Object* sphere_blue = mWorld->getObject(mWorld->getNumObjects()-1); // TODO: This "constant" is totally arbitrary!!!
-        Thrower thrower(*mWorld, mTimeText, *sphere_red, *sphere_blue);
+        robotics::Object* sphere_red   = mWorld->getObject(mWorld->getNumObjects()-3); // TODO: Fix prettier
+        robotics::Object* sphere_blue  = mWorld->getObject(mWorld->getNumObjects()-2); // TODO: Fix prettier
+        robotics::Object* sphere_green = mWorld->getObject(mWorld->getNumObjects()-1); // TODO: Fix prettier
+        Thrower thrower(*mWorld, mTimeText, *sphere_red, *sphere_blue, *sphere_green);
         
         //find robot position to determine direction of sphere_red
         VectorXd robotPos(3);

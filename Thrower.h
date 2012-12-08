@@ -22,18 +22,20 @@ public:
     /// Member variables
     robotics::World &mWorld;  // The world
     robotics::Object &mSphereActual; // The object (aka the trash) we throw
-    robotics::Object &mSpherePredicted; // The object (aka the trash) we throw
+    robotics::Object &mSpherePredicted;
+    robotics::Object &mAimObject; // The object representing the aim
 
     /// Copy of gui stuff
     wxTextCtrl *mTimeText;
 
     Path objectPath; // Path of object
+    list<VectorXd> aims;
     Path predictedPath;
     list< Path > predictedPaths;
     Path jointPath; // Path of object
 
     Thrower(robotics::World &_world, wxTextCtrl *_timeText,
-        robotics::Object &_sphereActual, robotics::Object &_spherePredicted);
+        robotics::Object &_sphereActual, robotics::Object &_spherePredicted, robotics::Object &_aimObject);
 
     void throwObject(VectorXd pos);
     void SetThrowTimeline();
