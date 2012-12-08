@@ -1,5 +1,5 @@
-#ifndef __THROWER_H_
-#define __THROWER_H_
+#ifndef __LINEARPREDICTOR_H_
+#define __LINEARPREDICTOR_H_
 
 #include <iostream>
 #include <stdlib.h>
@@ -14,7 +14,7 @@
 using namespace std;
 using namespace Eigen;
 
-class LinearPredictor {
+class LinearPredictor : public Predictor {
 
 private:
     std::list<Eigen::VectorXd> predictedPath;
