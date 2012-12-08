@@ -24,6 +24,41 @@ std::list< VectorXd > projectileMotion(VectorXd pos, VectorXd vel, VectorXd acc)
         return res;
 }
 
+
+std::list< VectorXd > projectileMotionWRand(VectorXd pos, VectorXd vel, VectorXd acc, int randMaxAcc){
+	ECHO("START Random Projectile Motion"); 
+	
+	// initialize random seed
+	srand ( time(NULL) );					
+
+	// Build a list of VectorXds for the final path
+	std::list<VectorXd> res;				
+	do {
+		// Push the current position to the final path list
+		res.push_back(pos);
+		
+		// Build a temporary vector for the final randomized acceleration
+		VectorXd tempAcc;	
+
+		// Resize the list to the appropriate length/size
+		tempAcc.resize(3);	
+
+		// Generate a random acceleration
+		float randNum = (float)rand()/((float)RAND_MAX/(randMaxAcc)) - (float)randMaxAcc/2;
+		
+		// Add the random acceleration to the temporary randomized acceleration
+		tempAcc << randNum + acc[0], randNum + acc[1], randNum + acc[2];
+		
+		// Generate a new position for the path
+		pos += vel*dt + tempAcc*dt*dt/2.0;
+		
+		// Generate a new velocity for the next point on the path
+		vel += tempAcc*dt;
+	} while (pos[2] > 0);
+	ECHO("DONE Projectile Motion");
+	return res;
+}
+
 std::list< VectorXd > straightMotion(VectorXd startpos, VectorXd endpos){
         double t = 1;
         VectorXd dir = endpos - startpos;
@@ -40,6 +75,47 @@ std::list< VectorXd > straightMotion(VectorXd startpos, VectorXd endpos){
         } while ((pos-startpos).norm() < distance);
         return res;
 }
+
+std::list< VectorXd > projectileMotionWRandT(VectorXd pos, VectorXd vel, VectorXd acc, int randMaxAcc, int maxTime){
+	ECHO("START Random Projectile Motion"); 
+	
+	// initialize random seed
+	srand ( time(NULL) );					
+
+	// Build a list of VectorXds for the final path
+	std::list<VectorXd> res;		
+
+	// Build a counter to calculate the amount of "time" that has passed
+	int t = 0;
+	do {
+		// Push the current position to the final path list
+		res.push_back(pos);
+		
+		// Build a temporary vector for the final randomized acceleration
+		VectorXd tempAcc;	
+
+		// Resize the list to the appropriate length/size
+		tempAcc.resize(3);	
+
+		// Generate a random acceleration
+		float randNum = (float)rand()/((float)RAND_MAX/(randMaxAcc)) - (float)randMaxAcc/2;
+		
+		// Add the random acceleration to the temporary randomized acceleration
+		tempAcc << randNum + acc[0], randNum + acc[1], randNum + acc[2];
+		
+		// Generate a new position for the path
+		pos += vel*dt + tempAcc*dt*dt/2.0;
+		
+		// Generate a new velocity for the next point on the path
+		vel += tempAcc*dt;
+		
+		// Increment the time t
+		t += dt;
+	} while (t < maxTime);
+	ECHO("DONE Projectile Motion (Bounded by time)");
+	return res;
+}
+
 
 VectorXd calculateVelocities(VectorXd startpos, VectorXd endpos){
         VectorXd vel(3);
