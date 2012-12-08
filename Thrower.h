@@ -16,6 +16,7 @@ using namespace Eigen;
 class Thrower {
 
 public:
+    typedef list<VectorXd> Path;
     const int mRobotId;
 
     /// Member variables
@@ -26,10 +27,10 @@ public:
     /// Copy of gui stuff
     wxTextCtrl *mTimeText;
 
-    list<VectorXd> objectPath; // Path of object
-    list<VectorXd> predictedPath;
-    list< list<VectorXd> > predictedPaths;
-    list<VectorXd> jointPath; // Path of object
+    Path objectPath; // Path of object
+    Path predictedPath;
+    list< Path > predictedPaths;
+    Path jointPath; // Path of object
 
     Thrower(robotics::World &_world, wxTextCtrl *_timeText,
         robotics::Object &_sphereActual, robotics::Object &_spherePredicted);

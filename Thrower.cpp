@@ -74,9 +74,18 @@ void Thrower::throwObject(VectorXd pos) {
   jointPath.clear();
   VectorXd joints = mWorld.getRobot(0)->getQuickDofs();
  
-  for( list<VectorXd>::iterator it = objectPath.begin(); it != objectPath.end(); it++ ) {
+  for( list<Path>::iterator it_paths = predictedPaths.begin(); it_paths != predictedPaths.end(); it_paths++ ) {
+    Path &path = *it_paths;
+    VectorXd closest = path.back();
+    for( Path::iterator it = path.begin(); it != path.end(); it++ ) {
+      double dist_now = (pos-closest).norm();
+      double dist_other = (pos-*it).norm();
+      if(dist_other < dist_now){
+        closest = *it;
+      }
+    }
     jointPath.push_back(joints);
-    //joints = arm.OneStepTowardsXYZ(joints, *it);
+    joints = arm.OneStepTowardsXYZ(joints, closest);
   }
 }
 
