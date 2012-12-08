@@ -47,7 +47,7 @@ void Thrower::throwObject(VectorXd pos) {
   //PRINT(vels);
   
   VectorXd vel(3);
-  vel << 0, 0.6, 0.8; 
+  vel << 0.5, 2.6, 0.8; 
   VectorXd acc(3);
   acc << 0, 0, g; 
   

@@ -29,7 +29,7 @@ LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath){
         //call projectileMotionWRandT with no randomness
         VectorXd vel = (last - beforeLast)/dt;
         VectorXd acc(3); acc<<0,0,0;
-        predictedPath = projectileMotionWRandT(beforeLast, vel, acc, 0, 5.0);
+        predictedPath = projectileMotionWRandT(beforeLast, vel, acc, 0, 1.0);
 }
 
 std::list<Eigen::VectorXd> LinearPredictor::getPredictedPath(){
