@@ -50,6 +50,10 @@
 using namespace std;
 using namespace Eigen;
 
+// The speed of each joint, note that the joint values are between -120 to
+// 120 on the robot arm
+const double jointSpeeds = 100.0; // degrees/second
+
 class JointMover {
   private:
     /// Member variables
@@ -69,14 +73,18 @@ class JointMover {
     JointMover( robotics::World &_world, int _robotId,
         double _configStep = 0.1 ); // 0.046 = 1_degree * sqrt(7)
 
-    // Modifies q, true if could reach "in time". No actual movement!
-    bool GoToXYZ( VectorXd &_q, VectorXd _targetXYZ);
+    // True if could reach "in time". No actual movement!
+    bool GoToXYZ( VectorXd _qStart, VectorXd _targetXYZ, VectorXd &_qResult);
 
     // Returns new configuration q. No actual movement!
     VectorXd OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ);
 
     // Returns the workspace coordinate for a jointspace coordinate
     VectorXd GetXYZ( VectorXd _q );
+
+    static double jointSpaceDistance(VectorXd _q1, VectorXd _q2);
+    static VectorXd jointSpaceMovement(VectorXd _qStart, VectorXd _qGoal);
+
 };
 
 #endif

@@ -16,6 +16,7 @@
 
 #include <Eigen/LU>
 #include "JointMover.h"
+#include "newtonianPhysics.h"
 
 using namespace std;
 using namespace Eigen;
@@ -67,15 +68,15 @@ VectorXd JointMover::OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ) {
 }
 
 
-bool JointMover::GoToXYZ( VectorXd &_q, VectorXd _targetXYZ) {
+bool JointMover::GoToXYZ( VectorXd _qStart, VectorXd _targetXYZ, VectorXd &_qResult) {
   ECHO("BEGIN GoToXYZ");
-
+  _qResult = _qStart;
   mWorld.getRobot(mRobotId)->update();
-  VectorXd dXYZ = _targetXYZ - GetXYZ(_q); // GetXYZ also updates the config to _q, so Jaclin use an updated value
+  VectorXd dXYZ = _targetXYZ - GetXYZ(_qResult); // GetXYZ also updates the config to _qResult, so Jaclin use an updated value
   int iter = 0;
   while( dXYZ.norm() > mWorkspaceThresh && iter < mMaxIter ) {
-    _q = OneStepTowardsXYZ(_q, _targetXYZ);
-    dXYZ = (_targetXYZ - GetXYZ(_q) );
+    _qResult = OneStepTowardsXYZ(_qResult, _targetXYZ);
+    dXYZ = (_targetXYZ - GetXYZ(_qResult) );
     iter++;
   }
 
@@ -95,3 +96,15 @@ VectorXd JointMover::GetXYZ( VectorXd _q ) {
   return qXYZ;
 }
 
+static double JointMover::jointSpaceDistance(VectorXd _q1, VectorXd _q2) {
+  // This is the infinite norm
+  return (_q2-_q1).cwiseAbs().maxCoeff();
+}
+
+static VectorXd JointMover::jointSpaceMovement(VectorXd _qStart, VectorXd _qGoal) {
+  VectorXd diff = (_qGoal-_qStart);
+  for(int i = 0; i < diff.size(); i++){
+    diff[i] = max(-jointSpeeds*dt, min(jointSpeeds*dt, diff[i]));
+  }
+  return _qStart + diff;
+}

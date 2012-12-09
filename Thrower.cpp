@@ -69,19 +69,25 @@ void Thrower::throwObject(VectorXd pos) {
   jointPath.clear();
   VectorXd joints = mWorld.getRobot(0)->getQuickDofs();
  
+  bool GoToXYZ( VectorXd _qStart, VectorXd _targetXYZ, VectorXd &_qResult, double &_distance);
   for( list<Path>::iterator it_paths = predictedPaths.begin(); it_paths != predictedPaths.end(); it_paths++ ) {
     Path &path = *it_paths;
-    VectorXd closest = path.back();
+    VectorXd closestXYZ = path.back();
+    VectorXd qClosest = joints;
     for( Path::iterator it = path.begin(); it != path.end(); it++ ) {
-      double dist_now = (pos-closest).norm();
-      double dist_other = (pos-*it).norm();
-      if(dist_other < dist_now){
-        closest = *it;
+      double dist_now = JointMover::jointSpaceDistance(joints, qClosest);
+      VectorXd qTemp;
+      if(arm.GoToXYZ(joints, *it, qTemp)){
+        double dist_other = JointMover::jointSpaceDistance(joints, qTemp);
+        if(dist_other < dist_now){
+          closestXYZ = *it;
+          qClosest = qTemp;
+        }
       }
     }
     jointPath.push_back(joints);
-    joints = arm.OneStepTowardsXYZ(joints, closest);
-    aims.push_back(closest);
+    joints = JointMover::jointSpaceMovement(joints, qClosest);
+    aims.push_back(closestXYZ);
   }
 }
 
