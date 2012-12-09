@@ -19,7 +19,6 @@
 
 #include <Tabs/AllTabs.h>
 #include <GRIPApp.h>
-#include "JTFollower/JTFollower.h" 
 #include "Thrower.h" 
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
