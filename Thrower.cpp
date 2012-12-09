@@ -21,11 +21,10 @@ using namespace std;
 using namespace Eigen;
 
 Thrower::Thrower(robotics::World &_world, wxTextCtrl *_timeText,
-    robotics::Object &_sphereActual, robotics::Object &_spherePredicted, robotics::Object &_aimObject) :
+    robotics::Object &_sphereActual, robotics::Object &_spherePerceived, robotics::Object &_spherePredicted, robotics::Object &_aimStar) :
   mWorld(_world), mTimeText(_timeText), mRobotId(0),
-  mSphereActual(_sphereActual), mSpherePredicted(_spherePredicted),
-  mAimObject(_aimObject){
-  // TODO: mRobotId shouldn't be fixed 0, rather a parameter
+  mSphereActual(_sphereActual), mSpherePerceived(_spherePerceived),  mSpherePredicted(_spherePredicted),
+  mAimStar(_aimStar){
 }
 
 // The effect of this method is that it will fill the path value
@@ -48,17 +47,17 @@ void Thrower::throwObject(VectorXd pos) {
   
   //calculate motion in steps
   objectPath = projectileMotion(rstart, vels, acc);
-  addSensorNoise(objectPath);
+  perceivedPath = addSensorNoise(objectPath, 0.2);
   //objectPath = straightMotion(rstart, rrp);
   
   aims.clear();
   predictedPath.clear();
   predictedPaths.clear();
 
-  for(list<VectorXd>::iterator it = objectPath.begin(); it != objectPath.end(); it++){
+  for(list<VectorXd>::iterator it = perceivedPath.begin(); it != perceivedPath.end(); it++){
     list<VectorXd>::iterator it_after = it;
     it_after++;
-    QuadraticPredictor predictor(list<VectorXd>(objectPath.begin(), it_after));
+    QuadraticPredictor predictor(list<VectorXd>(perceivedPath.begin(), it_after));
     predictedPaths.push_back(predictor.getPredictedPath());
     predictedPath.push_back(predictedPaths.back().back());
   }
@@ -96,11 +95,16 @@ double fRand(double min, double max) {
 }
 
 
-void Thrower::addSensorNoise(list<VectorXd> path){
+list<VectorXd> Thrower::addSensorNoise(list<VectorXd> path, double maxNoise){
         for( list<VectorXd>::iterator it = path.begin(); it != path.end(); it++){
-                VectorXd noise(3); noise << fRand(0.0,0.8), fRand(0.0,0.8), fRand(0.0,0.8);
+                VectorXd noise(3); noise << fRand(0.0,maxNoise), fRand(0.0,maxNoise), fRand(0.0,maxNoise);
+                //ECHO("before:")
+                //PRINT(*it)
                 *it = *it + noise;
-        }        
+                //ECHO("after:")
+                //PRINT(*it)
+        }
+        return path;        
 }
 
 VectorXd Thrower::findRandomReachablePosition(VectorXd pos){
@@ -146,25 +150,31 @@ void Thrower::SetThrowTimeline(){
 
     list<VectorXd>::iterator it_j;
     list<VectorXd>::iterator it_pred;
+    list<VectorXd>::iterator it_percvd;
     list<VectorXd>::iterator it_aim;
-    for( list<VectorXd>::iterator it = objectPath.begin(), it_j = jointPath.begin(), it_pred = predictedPath.begin(), it_aim = aims.begin();
-         it != objectPath.end() && it_pred != predictedPath.end(); it++, it_j++, it_pred++, it_aim++ ) {
+    for( list<VectorXd>::iterator it = objectPath.begin(), it_j = jointPath.begin(),it_percvd = perceivedPath.begin(), it_pred = predictedPath.begin(), it_aim = aims.begin();
+         it != objectPath.end() && it_pred != predictedPath.end(); it++, it_j++, it_percvd++, it_pred++, it_aim++ ) {
         
         VectorXd &pos = *it;
         VectorXd &pos_pred = *it_pred;
+        VectorXd &pos_percvd = *it_percvd;
         VectorXd &pos_aim = *it_aim;
         
         //update sphere in motion
         mSphereActual.setPositionXYZ(pos[0], pos[1], pos[2]);
         mSphereActual.update();
         
+        //update perceived sphere
+        mSpherePerceived.setPositionXYZ(pos_percvd[0], pos_percvd[1], pos_percvd[2]);
+        mSpherePerceived.update();
+        
         //update predicted sphere position
         mSpherePredicted.setPositionXYZ(pos_pred[0], pos_pred[1], pos_pred[2]);
         mSpherePredicted.update();
         
         //update robot's calculation of where to intercept sphere
-        mAimObject.setPositionXYZ(pos_aim[0], pos_aim[1], pos_aim[2]);
-        mAimObject.update();
+        mAimStar.setPositionXYZ(pos_aim[0], pos_aim[1], pos_aim[2]);
+        mAimStar.update();
         
         //update robot and world frame
         mWorld.getRobot(mRobotId)->setQuickDofs( *it_j );

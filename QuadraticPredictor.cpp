@@ -41,21 +41,21 @@ QuadraticPredictor::QuadraticPredictor(std::list<Eigen::VectorXd> observedPath){
 		// Grab the third to end node
 		VectorXd p1 = *it;
 		
-		// Debug the three points
+		/*Debug the three points
 		PRINT(p1);
 		PRINT(p2);
-		PRINT(p3);
+		PRINT(p3);*/
 		
 		VectorXd v1 = (p2-p1)*1/dt;
 		VectorXd v2 = (p3-p2)*1/dt;
 		VectorXd acc = (v2-v1)*1/dt;
 		
-		PRINT(v1);
+		/*PRINT(v1);
 		PRINT(v2);
-		PRINT(acc);
+		PRINT(acc);*/
 		
 		//call projectileMotionWRandT with no randomness
-		predictedPath = projectileMotionWRandT(p3, v2, acc, 0, 1.0);
+		predictedPath = projectileMotionWRandT(p3, v2, acc, 0, 0.1);
 }
 
 std::list<Eigen::VectorXd> QuadraticPredictor::getPredictedPath(){

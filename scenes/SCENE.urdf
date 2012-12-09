@@ -10,6 +10,9 @@
 <include filename="sphere_red.urdf" model_name="sphere_red"/>
 <include filename="sphere_blue.urdf" model_name="sphere_blue"/>
 <include filename="sphere_green.urdf" model_name="sphere_green"/>
+<include filename="star_white.urdf" model_name="star_white"/>
+<include filename="star_yellow.urdf" model_name="star_yellow"/>
+<include filename="star_purple.urdf" model_name="star_purple"/>
 <!-- Construct the world -->
 <entity model="schunk_arm" name="SchunkArm">
 	<origin xyz="-0.132 1.316 0.721" rpy="-1.57 1.57 0"/>
@@ -40,15 +43,28 @@
 	<origin xyz="2.168 1.188 0.416" rpy="1.57 0 .87"/>
 </entity>
 
-<entity model="sphere_red" name="sphere 1">
+<entity model="star_white" name="star white">
+	<origin xyz="0 6 1" rpy="0 0 0"/>
+</entity>
+
+<entity model="star_yellow" name="star yellow">
+	<origin xyz="0 7 1" rpy="0 0 0"/>
+</entity>
+
+<entity model="star_purple" name="star purple">
+	<origin xyz="0 8 1" rpy="0 0 0"/>
+</entity>
+
+<entity model="sphere_red" name="sphere red">
 	<origin xyz="0 3 1" rpy="0 0 0"/>
 </entity>
 
-<entity model="sphere_blue" name="sphere 2">
+<entity model="sphere_blue" name="sphere blue">
 	<origin xyz="0 4 1" rpy="0 0 0"/>
 </entity>
 
-<entity model="sphere_green" name="sphere 3">
+<entity model="sphere_green" name="sphere green">
 	<origin xyz="0 5 1" rpy="0 0 0"/>
 </entity>
+
 </world> 

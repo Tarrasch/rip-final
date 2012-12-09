@@ -20,29 +20,31 @@ public:
     const int mRobotId;
 
     /// Member variables
-    robotics::World &mWorld;  // The world
-    robotics::Object &mSphereActual; // The object (aka the trash) we throw
+    robotics::World &mWorld;  
+    robotics::Object &mSphereActual; 
+    robotics::Object &mSpherePerceived;
     robotics::Object &mSpherePredicted;
-    robotics::Object &mAimObject; // The object representing the aim
+    robotics::Object &mAimStar; 
 
     /// Copy of gui stuff
     wxTextCtrl *mTimeText;
 
-    Path objectPath; // Path of object
+    Path objectPath;
+    Path perceivedPath; 
     list<VectorXd> aims;
     Path predictedPath;
     list< Path > predictedPaths;
-    Path jointPath; // Path of object
+    Path jointPath; 
 
     Thrower(robotics::World &_world, wxTextCtrl *_timeText,
-        robotics::Object &_sphereActual, robotics::Object &_spherePredicted, robotics::Object &_aimObject);
+        robotics::Object &_sphereActual, robotics::Object &_spherePerceived, robotics::Object &_spherePredicted, robotics::Object &_aimStar);
 
     void throwObject(VectorXd pos);
     void SetThrowTimeline();
 
     VectorXd findRandomReachablePosition(VectorXd pos);
     VectorXd findRandomStartPosition(VectorXd pos);
-    void addSensorNoise(list<VectorXd> path);
+    list<VectorXd> addSensorNoise(list<VectorXd> path, double noiseMax);
 };
 #endif
 
