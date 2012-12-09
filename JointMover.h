@@ -52,7 +52,7 @@ using namespace Eigen;
 
 // The speed of each joint, note that the joint values are between -120 to
 // 120 on the robot arm
-const double jointSpeeds = 100.0; // degrees/second
+const double jointSpeeds = 5.0; // degrees/second
 
 class JointMover {
   private:
@@ -66,7 +66,6 @@ class JointMover {
     dynamics::BodyNodeDynamics *mEENode;
     int mEEId;
     int mMaxIter;
-    MatrixXd pseudoInvJac;
 
     MatrixXd GetPseudoInvJac();
 

@@ -71,7 +71,7 @@ void Thrower::throwObject(VectorXd pos) {
     Path &path = *it_paths;
     VectorXd closestXYZ = path.back();
     VectorXd qClosest(7);
-    qClosest << 360, 360, 360, 360, 360, 360, 360;
+    qClosest << 360, 360, 360, 360, 360, 360, 36000000000000000;
     for( Path::iterator it = path.begin(); it != path.end(); it++ ) {
       double dist_now = JointMover::jointSpaceDistance(joints, qClosest);
       VectorXd qTemp;
@@ -86,7 +86,7 @@ void Thrower::throwObject(VectorXd pos) {
       }
     }
     jointPath.push_back(joints);
-    joints = JointMover::jointSpaceMovement(joints, qClosest);
+    joints = JointMover::jointSpaceMovement(joints, qClosest.norm() > 100000 ? joints : qClosest);
     aims.push_back(closestXYZ);
   }
 }

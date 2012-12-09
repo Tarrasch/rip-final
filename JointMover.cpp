@@ -35,24 +35,20 @@ JointMover::JointMover( robotics::World &_world, int _robotId, double _configSte
   std::string mEEName =  mWorld.getRobot(mRobotId)->getNode(mEEId)->getName();
   
   //init goal_finder
-  mMaxIter = 1000;
+  mMaxIter = 100;
   mWorkspaceThresh = 0.02; // An error of half the resolution // dunno why 0.02
   mEENode = (dynamics::BodyNodeDynamics*)mWorld.getRobot(mRobotId)->getNode(mEEName.c_str());
+}
 
-  // Precalculate pseduojacobian
+MatrixXd JointMover::GetPseudoInvJac() {
+   // Precalculate pseduojacobian
   //printf("Num Dependent DOF minus 6D0F is : %d \n", mEENode->getNumDependentDofs() - 6 );
   MatrixXd Jaclin = mEENode->getJacobianLinear().topRightCorner( 3, mLinks.size() );
   //std::cout<< "Jaclin: \n"<<Jaclin << std::endl;
   MatrixXd JaclinT = Jaclin.transpose();
   MatrixXd JJt = (Jaclin*JaclinT);
   FullPivLU<MatrixXd> lu(JJt);
-  pseudoInvJac = JaclinT*( lu.inverse() );
-
-  //std::cout<< "Jaclin pseudo inverse: \n"<<Jt << std::endl;  
-}
-
-MatrixXd JointMover::GetPseudoInvJac() {
-  return pseudoInvJac;
+  return JaclinT*( lu.inverse() );;
 }
 
 VectorXd JointMover::OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ) {

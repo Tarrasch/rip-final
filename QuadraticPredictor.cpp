@@ -48,14 +48,15 @@ QuadraticPredictor::QuadraticPredictor(std::list<Eigen::VectorXd> observedPath){
 		
 		VectorXd v1 = (p2-p1)*1/dt;
 		VectorXd v2 = (p3-p2)*1/dt;
-		VectorXd acc = (v2-v1)*1/dt;
+		VectorXd acc = (observedPath.size() > 2) * (v2-v1)*1/dt;
+		
 		
 		/*PRINT(v1);
 		PRINT(v2);
 		PRINT(acc);*/
 		
 		//call projectileMotionWRandT with no randomness
-		predictedPath = projectileMotionWRandT(p3, v2, acc, 0, 0.3);
+		predictedPath = projectileMotionWRandT(p3, v2, acc, 0, 0.8);
 }
 
 std::list<Eigen::VectorXd> QuadraticPredictor::getPredictedPath(){
