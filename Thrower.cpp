@@ -10,6 +10,7 @@
 #include <Tabs/GRIPTab.h>
 #include "JointMover.h"
 #include "LinearPredictor.h"
+#include "QuadraticPredictor.h"
 #include "Predictor.h"
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
@@ -57,7 +58,7 @@ void Thrower::throwObject(VectorXd pos) {
   for(list<VectorXd>::iterator it = objectPath.begin(); it != objectPath.end(); it++){
     list<VectorXd>::iterator it_after = it;
     it_after++;
-    LinearPredictor predictor(list<VectorXd>(objectPath.begin(), it_after));
+    QuadraticPredictor predictor(list<VectorXd>(objectPath.begin(), it_after));
     predictedPaths.push_back(predictor.getPredictedPath());
     predictedPath.push_back(predictedPaths.back().back());
   }
@@ -90,7 +91,6 @@ double fRand(double min, double max) {
 
 
 void Thrower::addSensorNoise(list<VectorXd> path){
-        path
         for( list<VectorXd>::iterator it = path.begin(); it != path.end(); it++){
                 VectorXd noise(3); noise << fRand(0.0,0.8), fRand(0.0,0.8), fRand(0.0,0.8);
                 *it = *it + noise;
