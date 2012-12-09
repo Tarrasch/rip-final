@@ -64,13 +64,6 @@ void Thrower::throwObject(VectorXd pos) {
     predictedPaths.push_back(predictor.getPredictedPath());
     predictedPath.push_back(predictedPaths.back().back());
   }
-  /* list<VectorXd> smallObjectPath; */
-  /* list<VectorXd>::iterator it = objectPath.begin(); */
-  /* for(int i = 0; i < objectPath.size()/2-5; i++, it++){ */
-  /*   smallObjectPath.push_back(*it); */
-  /* } */
-  /* LinearPredictor predictor(smallObjectPath); */
-  /* predictedPath = predictor.getPredictedPath(); */
 
   JointMover arm(mWorld, mRobotId);
   jointPath.clear();
