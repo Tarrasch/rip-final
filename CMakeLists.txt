@@ -24,9 +24,9 @@ INCLUDE_DIRECTORIES( ${DART_INCLUDE_DIRS} )
 
 # Search all header and source files
 set ( rip_srcs  tabRipPlannerApp.cpp tabRipPlanner.cpp RRT.cpp PathPlanner.cpp
-  JointMover.cpp newtonianPhysics.cpp Thrower.cpp LinearPredictor.cpp)
+  JointMover.cpp newtonianPhysics.cpp Thrower.cpp LinearPredictor.cpp QuadraticPredictor.cpp)
 set ( rip_hdrs  tabRipPlanner.h RRT.h PathPlanner.h JointMover.h
-  newtonianPhysics.h Thrower.h LinearPredictor.h Predictor.h)
+  newtonianPhysics.h Thrower.h LinearPredictor.h Predictor.h QuadraticPredictor.h)
 set ( kdtree_srcs kdtree/kdtree.c )
 set ( kdtree_hdrs kdtree/kdtree.h )
 

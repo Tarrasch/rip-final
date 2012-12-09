@@ -10,6 +10,7 @@
 #include <Tabs/GRIPTab.h>
 #include "JointMover.h"
 #include "LinearPredictor.h"
+#include "QuadraticPredictor.h"
 #include "Predictor.h"
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
@@ -29,38 +30,35 @@ Thrower::Thrower(robotics::World &_world, wxTextCtrl *_timeText,
 
 // The effect of this method is that it will fill the path value
 void Thrower::throwObject(VectorXd pos) {
-  VectorXd shift(3);
-  shift << 0, 10, 0;
-  
+
   //get random reachable position (rrp) for ball's projectile motion
-  //...
   VectorXd rrp = findRandomReachablePosition(pos);
   
+  //get first a start coordinate to serve as center of bounded rectangle
+  VectorXd startCoord(3); startCoord << 0, -2.6, 0.0; 
+  
   //get random start position for ball's projectile motion
-  //... 
-  VectorXd startCoord(3);
-  startCoord << 0, -3.6, 1.0; //area in front of arm
   VectorXd rstart = findRandomStartPosition(startCoord);
   
-  //calculate velocities to pass through such (rrp) TODO
-  //VectorXd vels = calculateVelocities(rstart, rrp);
-  //PRINT(vels);
+  //calculate velocities to pass through such (rrp)
+  VectorXd vels = calculateVelocities(rstart, rrp);
   
-  VectorXd vel(3);
-  vel << 0.5, 2.6, 0.8; 
-  VectorXd acc(3);
-  acc << 0, 0, g; 
+  //define acceleration vector; accx=0, accy=0, accz= g
+  VectorXd acc(3); acc<< 0,0,g;
   
   //calculate motion in steps
-  //objectPath = projectileMotion(rstart, vels, );
+  objectPath = projectileMotion(rstart, vels, acc);
+  addSensorNoise(objectPath);
+  //objectPath = straightMotion(rstart, rrp);
+  
   aims.clear();
   predictedPath.clear();
   predictedPaths.clear();
-  objectPath = projectileMotion(rstart, vel, acc);
+
   for(list<VectorXd>::iterator it = objectPath.begin(); it != objectPath.end(); it++){
     list<VectorXd>::iterator it_after = it;
     it_after++;
-    LinearPredictor predictor(list<VectorXd>(objectPath.begin(), it_after));
+    QuadraticPredictor predictor(list<VectorXd>(objectPath.begin(), it_after));
     predictedPaths.push_back(predictor.getPredictedPath());
     predictedPath.push_back(predictedPaths.back().back());
   }
@@ -92,12 +90,18 @@ void Thrower::throwObject(VectorXd pos) {
 }
 
 //get random double between fmin and fmax
-double fRand(double min, double max)
-{
+double fRand(double min, double max) {
     double f = (double)rand() / RAND_MAX;
     return min + f * (max - min);
 }
 
+
+void Thrower::addSensorNoise(list<VectorXd> path){
+        for( list<VectorXd>::iterator it = path.begin(); it != path.end(); it++){
+                VectorXd noise(3); noise << fRand(0.0,0.8), fRand(0.0,0.8), fRand(0.0,0.8);
+                *it = *it + noise;
+        }        
+}
 
 VectorXd Thrower::findRandomReachablePosition(VectorXd pos){
        VectorXd target(3);
@@ -130,7 +134,6 @@ void Thrower::SetThrowTimeline(){
         cout << "--(!) Must create a nonempty plan before setting timeline (!)--" << endl;
         return;
     }
-
     double T;
     mTimeText->GetValue().ToDouble(&T);
 
@@ -144,27 +147,26 @@ void Thrower::SetThrowTimeline(){
     list<VectorXd>::iterator it_j;
     list<VectorXd>::iterator it_pred;
     list<VectorXd>::iterator it_aim;
-    for( list<VectorXd>::iterator it = objectPath.begin(),
-         it_j = jointPath.begin(),
-         it_pred = predictedPath.begin(),
-         it_aim = aims.begin()
-         ;
-         it != objectPath.end() &&
-         it_pred != predictedPath.end()
-         ;
-         it++, it_j++, it_pred++, it_aim++ ) {
+    for( list<VectorXd>::iterator it = objectPath.begin(), it_j = jointPath.begin(), it_pred = predictedPath.begin(), it_aim = aims.begin();
+         it != objectPath.end() && it_pred != predictedPath.end(); it++, it_j++, it_pred++, it_aim++ ) {
+        
         VectorXd &pos = *it;
         VectorXd &pos_pred = *it_pred;
         VectorXd &pos_aim = *it_aim;
-        //PRINT(pos);
-        //PRINT(*it_j);
+        
+        //update sphere in motion
         mSphereActual.setPositionXYZ(pos[0], pos[1], pos[2]);
         mSphereActual.update();
         
+        //update predicted sphere position
         mSpherePredicted.setPositionXYZ(pos_pred[0], pos_pred[1], pos_pred[2]);
         mSpherePredicted.update();
+        
+        //update robot's calculation of where to intercept sphere
         mAimObject.setPositionXYZ(pos_aim[0], pos_aim[1], pos_aim[2]);
         mAimObject.update();
+        
+        //update robot and world frame
         mWorld.getRobot(mRobotId)->setQuickDofs( *it_j );
         mWorld.getRobot(mRobotId)->update();
         frame->AddWorld( &mWorld );

@@ -42,6 +42,7 @@ public:
 
     VectorXd findRandomReachablePosition(VectorXd pos);
     VectorXd findRandomStartPosition(VectorXd pos);
+    void addSensorNoise(list<VectorXd> path);
 };
 #endif
 
