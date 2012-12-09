@@ -12,6 +12,7 @@
 #include "LinearPredictor.h"
 #include "QuadraticPredictor.h"
 #include "Predictor.h"
+#include "PathPlanner.h"
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
 #define ARM_LENGTH 1.10
@@ -47,7 +48,7 @@ void Thrower::throwObject(VectorXd pos) {
   
   //calculate motion in steps
   objectPath = projectileMotion(rstart, vels, acc);
-  perceivedPath = addSensorNoise(objectPath, 0.0);
+  perceivedPath = addSensorNoise(objectPath, 0.1);
   //objectPath = straightMotion(rstart, rrp);
   
   aims.clear();
@@ -86,7 +87,17 @@ void Thrower::throwObject(VectorXd pos) {
       }
     }
     jointPath.push_back(joints);
-    joints = JointMover::jointSpaceMovement(joints, qClosest.norm() > 100000 ? joints : qClosest);
+    VectorXd jointsGoal = qClosest.norm() > 100000 ? joints : qClosest;
+    
+    //create path planner
+    PathPlanner *planner = new PathPlanner(mWorld, false, jointSpeeds*dt);
+    VectorXi mLinks = mWorld.getRobot(mRobotId)->getQuickDofsIndices();
+    
+    if(planner->planPath(mRobotId,mLinks, joints, jointsGoal, false, false, true, false, 5000)){ 
+        list<VectorXd>::iterator ite = planner->path.begin();
+        joints = *(++ite);
+    }
+    //joints = JointMover::jointSpaceMovement(joints, jointsGoal);
     aims.push_back(closestXYZ);
   }
 }
