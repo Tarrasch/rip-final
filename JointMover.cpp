@@ -56,7 +56,8 @@ MatrixXd JointMover::GetPseudoInvJac() {
 }
 
 VectorXd JointMover::OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ) {
-  // ECHO("  BEGIN OneStepTowardsXYZ");
+  //ECHO("  BEGIN OneStepTowardsXYZ");
+
   assert(_targetXYZ.size() == 3);
   assert(_q.size() > 3);
   VectorXd dXYZ = _targetXYZ - GetXYZ(_q); // GetXYZ also updates the config to _q, so Jaclin use an updated value
@@ -66,12 +67,13 @@ VectorXd JointMover::OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ) {
   dConfig = alpha*dConfig;
 
   // ECHO("  END OneStepTowardsXYZ");
+
   return _q + dConfig;
 }
 
 
 bool JointMover::GoToXYZ( VectorXd _qStart, VectorXd _targetXYZ, VectorXd &_qResult) {
-  ECHO("BEGIN GoToXYZ");
+  //ECHO("BEGIN GoToXYZ");
   _qResult = _qStart;
   mWorld.getRobot(mRobotId)->update();
   VectorXd dXYZ = _targetXYZ - GetXYZ(_qResult); // GetXYZ also updates the config to _qResult, so Jaclin use an updated value
@@ -82,7 +84,7 @@ bool JointMover::GoToXYZ( VectorXd _qStart, VectorXd _targetXYZ, VectorXd &_qRes
     iter++;
   }
 
-  ECHO("END GoToXYZ");
+  //ECHO("END GoToXYZ");
   return iter < mMaxIter;
 }
 

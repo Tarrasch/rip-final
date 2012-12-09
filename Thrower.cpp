@@ -47,7 +47,7 @@ void Thrower::throwObject(VectorXd pos) {
   
   //calculate motion in steps
   objectPath = projectileMotion(rstart, vels, acc);
-  perceivedPath = addSensorNoise(objectPath, 0.2);
+  perceivedPath = addSensorNoise(objectPath, 0.0);
   //objectPath = straightMotion(rstart, rrp);
   
   aims.clear();
@@ -70,14 +70,17 @@ void Thrower::throwObject(VectorXd pos) {
   for( list<Path>::iterator it_paths = predictedPaths.begin(); it_paths != predictedPaths.end(); it_paths++ ) {
     Path &path = *it_paths;
     VectorXd closestXYZ = path.back();
-    VectorXd qClosest = joints;
+    VectorXd qClosest(7);
+    qClosest << 360, 360, 360, 360, 360, 360, 360;
     for( Path::iterator it = path.begin(); it != path.end(); it++ ) {
       double dist_now = JointMover::jointSpaceDistance(joints, qClosest);
       VectorXd qTemp;
       if(arm.GoToXYZ(joints, *it, qTemp)){
         double dist_other = JointMover::jointSpaceDistance(joints, qTemp);
+        ECHO("1");
         if(dist_other < dist_now){
           closestXYZ = *it;
+          ECHO("2");
           qClosest = qTemp;
         }
       }
