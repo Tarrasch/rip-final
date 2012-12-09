@@ -393,7 +393,6 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
 	ECHO("Test Throw Pressed");
 	
     if ( mWorld != NULL ) {
-	ECHO("World is not NULL");
         robotics::Object* sphere_red   = mWorld->getObject(mWorld->getNumObjects()-3); // TODO: Fix prettier
         robotics::Object* sphere_blue  = mWorld->getObject(mWorld->getNumObjects()-2); // TODO: Fix prettier
         robotics::Object* sphere_green = mWorld->getObject(mWorld->getNumObjects()-1); // TODO: Fix prettier
@@ -410,8 +409,6 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
         //velocities are calculated to reach such position
         thrower.throwObject(robotPos);
         thrower.SetThrowTimeline();
-        
-        std::cout << std::endl;
     } else {
       std::cout << "(!) World must be loaded!!!!!!!!!!!"<< std::endl;
     }
