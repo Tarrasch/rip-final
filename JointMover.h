@@ -66,6 +66,7 @@ class JointMover {
     dynamics::BodyNodeDynamics *mEENode;
     int mEEId;
     int mMaxIter;
+    MatrixXd pseudoInvJac;
 
     MatrixXd GetPseudoInvJac();
 

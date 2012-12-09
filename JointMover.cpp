@@ -38,23 +38,25 @@ JointMover::JointMover( robotics::World &_world, int _robotId, double _configSte
   mMaxIter = 1000;
   mWorkspaceThresh = 0.02; // An error of half the resolution // dunno why 0.02
   mEENode = (dynamics::BodyNodeDynamics*)mWorld.getRobot(mRobotId)->getNode(mEEName.c_str());
-}
 
-MatrixXd JointMover::GetPseudoInvJac() {
+  // Precalculate pseduojacobian
   //printf("Num Dependent DOF minus 6D0F is : %d \n", mEENode->getNumDependentDofs() - 6 );
   MatrixXd Jaclin = mEENode->getJacobianLinear().topRightCorner( 3, mLinks.size() );
   //std::cout<< "Jaclin: \n"<<Jaclin << std::endl;
   MatrixXd JaclinT = Jaclin.transpose();
-  MatrixXd Jt;
   MatrixXd JJt = (Jaclin*JaclinT);
   FullPivLU<MatrixXd> lu(JJt);
-  Jt = JaclinT*( lu.inverse() );
+  pseudoInvJac = JaclinT*( lu.inverse() );
+
   //std::cout<< "Jaclin pseudo inverse: \n"<<Jt << std::endl;  
-  return Jt;
+}
+
+MatrixXd JointMover::GetPseudoInvJac() {
+  return pseudoInvJac;
 }
 
 VectorXd JointMover::OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ) {
-  ECHO("  BEGIN OneStepTowardsXYZ");
+  // ECHO("  BEGIN OneStepTowardsXYZ");
   assert(_targetXYZ.size() == 3);
   assert(_q.size() > 3);
   VectorXd dXYZ = _targetXYZ - GetXYZ(_q); // GetXYZ also updates the config to _q, so Jaclin use an updated value
@@ -63,7 +65,7 @@ VectorXd JointMover::OneStepTowardsXYZ( VectorXd _q, VectorXd _targetXYZ) {
   double alpha = min((mConfigStep/dConfig.norm()), 1.0); // Constant to not let vector to be larger than mConfigStep
   dConfig = alpha*dConfig;
 
-  ECHO("  END OneStepTowardsXYZ");
+  // ECHO("  END OneStepTowardsXYZ");
   return _q + dConfig;
 }
 
