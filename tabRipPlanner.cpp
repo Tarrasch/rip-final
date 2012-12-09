@@ -393,10 +393,11 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
 	ECHO("Test Throw Pressed");
 	
     if ( mWorld != NULL ) {
-        robotics::Object* sphere_red   = mWorld->getObject(mWorld->getNumObjects()-3); // TODO: Fix prettier
-        robotics::Object* sphere_blue  = mWorld->getObject(mWorld->getNumObjects()-2); // TODO: Fix prettier
-        robotics::Object* sphere_green = mWorld->getObject(mWorld->getNumObjects()-1); // TODO: Fix prettier
-        Thrower thrower(*mWorld, mTimeText, *sphere_red, *sphere_blue, *sphere_green);
+        robotics::Object* sphere_red   = mWorld->getObject(mWorld->getNumObjects()-3);
+        robotics::Object* sphere_blue  = mWorld->getObject(mWorld->getNumObjects()-2); 
+        robotics::Object* sphere_green = mWorld->getObject(mWorld->getNumObjects()-1);
+        robotics::Object* star_yellow = mWorld->getObject(mWorld->getNumObjects()-5); 
+        Thrower thrower(*mWorld, mTimeText, *sphere_red, *sphere_green, *sphere_blue, *star_yellow);
         
         //find robot position to determine direction of sphere_red
         VectorXd robotPos(3);
