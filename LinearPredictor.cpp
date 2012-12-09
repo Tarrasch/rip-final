@@ -14,7 +14,7 @@ using namespace std;
 using namespace Eigen;
 
 LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath){
-        assert(observedPath.size() > 0);
+        /*assert(observedPath.size() > 0);
         VectorXd last = observedPath.back();
         list<VectorXd>::iterator it = observedPath.end();
         it--;
@@ -29,7 +29,58 @@ LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath){
         //call projectileMotionWRandT with no randomness
         VectorXd vel = (last - beforeLast)/dt;
         VectorXd acc(3); acc<<0,0,0;
-        predictedPath = projectileMotionWRandT(beforeLast, vel, acc, 0, 1.0);
+        predictedPath = projectileMotionWRandT(beforeLast, vel, acc, 0, 1.0);*/
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		// Terminate if the path size is zero elements
+		assert(observedPath.size() > 0);
+		
+		// Build an iterator over the entire path. Start at the "end" of the path. Note: this "end" node doesn't actually contain the end of the path but a special node that is 1 past the true end
+		list<VectorXd>::iterator it = observedPath.end();
+		
+		// Decremenet the iterator and grab the end node
+		it--;
+		VectorXd p3 = *it;
+		
+		// Check to make sure we aren't at the beginning now (ie, 1 node paths). If not decremenet the iterator
+		if(it != observedPath.begin()) { 
+			it--;
+		}
+		
+		// Grab the second to end node
+		VectorXd p2 = *it;
+		
+		// Check to make sure we aren't at the beginning now (ie, 2 node paths). If not decremenet the iterator
+		if(it != observedPath.begin()) { 
+			it--;
+		}
+		
+		// Grab the third to end node
+		VectorXd p1 = *it;
+		
+		// Debug the three points
+		PRINT(p1);
+		PRINT(p2);
+		PRINT(p3);
+		
+		VectorXd v1 = (p2-p1)*1/dt;
+		VectorXd v2 = (p3-p2)*1/dt;
+		VectorXd acc = (v2-v1)*1/dt;
+		
+		PRINT(v1);
+		PRINT(v2);
+		PRINT(acc);
+		
+		//call projectileMotionWRandT with no randomness
+		predictedPath = projectileMotionWRandT(p3, v2, acc, 0, 1.0);
 }
 
 std::list<Eigen::VectorXd> LinearPredictor::getPredictedPath(){

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <Eigen/LU>
 #include "newtonianPhysics.h"
+#include <time.h>
 
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;

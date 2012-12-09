@@ -10,6 +10,7 @@
 #include <Tabs/GRIPTab.h>
 #include "JointMover.h"
 #include "LinearPredictor.h"
+//#include "QuadraticPredictor.h"
 #include "Predictor.h"
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
