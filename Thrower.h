@@ -9,6 +9,8 @@
 #include <list>
 #include <robotics/World.h>
 #include <wx/wx.h>
+#define CLOSEST_RRT true
+#define MULTI_RRT false
 
 using namespace std;
 using namespace Eigen;
@@ -39,12 +41,8 @@ public:
     Thrower(robotics::World &_world, wxTextCtrl *_timeText,
         robotics::Object &_sphereActual, robotics::Object &_spherePerceived, robotics::Object &_spherePredicted, robotics::Object &_aimStar);
 
-    void throwObject(VectorXd pos);
+    void throwObject(VectorXd pos, double noise, double prediction_time, int maxnodes, bool approach);
     void SetThrowTimeline();
-
-    VectorXd findRandomReachablePosition(VectorXd pos);
-    VectorXd findRandomStartPosition(VectorXd pos);
-    list<VectorXd> addSensorNoise(list<VectorXd> path, double noiseMax);
 };
 #endif
 

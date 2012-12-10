@@ -13,6 +13,7 @@
 
 #include "PathPlanner.h"
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
+#define ECHO(x) std::cout << x << std::endl;
 
 /**
  * @function PathPlanner
@@ -66,11 +67,10 @@ bool PathPlanner::planPath( int _robotId,
                             bool _smooth,
                             unsigned int _maxNodes ) {
 
-
   //world->mRobots[_robotId]->setQuickDofs( _start ); // Other quick way
   world->getRobot(_robotId)->setDofs( _start, _links );
-  if( world->checkCollision() )
-    return false;
+  /*if( world->checkCollision() )
+    return false;*/
 
   world->getRobot(_robotId)->setDofs( _goal, _links );
   if( world->checkCollision() )
@@ -92,7 +92,7 @@ bool PathPlanner::planPath( int _robotId,
 
 int randomNumber(int min, int max){
   int t = rand() % max + min;
-  std::cout << "Rand: " << t << std::endl;
+  //std::cout << "Rand: " << t << std::endl;
   return t;
 }
 /**
@@ -121,20 +121,20 @@ bool PathPlanner::planSingleTreeRrt( int _robotId,
 
         if(randomNumber(0,7) == 1){
           rrt.connect(_goal);
-          std::cout << "Connect greedy!" << std::endl;
+          //std::cout << "Connect greedy!" << std::endl;
         }
         else{
           rrt.connect();
-          std::cout << "Connect!" << std::endl;
+          //std::cout << "Connect!" << std::endl;
         }
       } else {
         if(randomNumber(0,7) == 1){
           rrt.tryStep(_goal);
-          std::cout << "greedy!" << std::endl;
+          //std::cout << "greedy!" << std::endl;
         }
         else{
           rrt.tryStep();
-          std::cout << "Simple!" << std::endl;
+          //std::cout << "Simple!" << std::endl;
         }
       }
 

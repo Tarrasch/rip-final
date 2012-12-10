@@ -43,16 +43,8 @@
 	<origin xyz="2.168 1.188 0.416" rpy="1.57 0 .87"/>
 </entity>
 
-<entity model="star_white" name="star white">
-	<origin xyz="0 6 1" rpy="0 0 0"/>
-</entity>
-
-<entity model="star_yellow" name="star yellow">
-	<origin xyz="0 7 1" rpy="0 0 0"/>
-</entity>
-
 <entity model="star_purple" name="star purple">
-	<origin xyz="0 8 1" rpy="0 0 0"/>
+	<origin xyz="0 6 1" rpy="0 0 0"/>
 </entity>
 
 <entity model="sphere_red" name="sphere red">

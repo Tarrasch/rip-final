@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Eigen;
 
-QuadraticPredictor::QuadraticPredictor(std::list<Eigen::VectorXd> observedPath){
+QuadraticPredictor::QuadraticPredictor(std::list<Eigen::VectorXd> observedPath, double time){
 		// Terminate if the path size is zero elements
 		assert(observedPath.size() > 0);
 		
@@ -56,7 +56,7 @@ QuadraticPredictor::QuadraticPredictor(std::list<Eigen::VectorXd> observedPath){
 		PRINT(acc);*/
 		
 		//call projectileMotionWRandT with no randomness
-		predictedPath = projectileMotionWRandT(p3, v2, acc, 0, 0.8);
+		predictedPath = projectileMotionWRandT(p3, v2, acc, 0, time);
 }
 
 std::list<Eigen::VectorXd> QuadraticPredictor::getPredictedPath(){

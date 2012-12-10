@@ -23,7 +23,6 @@
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
 
-
 /* Quick intro to adding tabs:
  * 1- Copy template cpp and header files and replace with new class name
  * 2- include classname.h in AllTabs.h, and use the ADD_TAB macro to create it
@@ -349,8 +348,6 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
       double stepSize = 0.02;
 
       mPlanner = new PathPlanner( *mWorld, false, stepSize );
-      //wxThread planThread;
-      //planThread.Create();
       
       mLinks = mWorld->getRobot(mRobotId)->getQuickDofsIndices();
       
@@ -392,22 +389,23 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
 	ECHO("Test Throw Pressed");
 	
     if ( mWorld != NULL ) {
+        robotics::Object* star_purple = mWorld->getObject(mWorld->getNumObjects()-4);
         robotics::Object* sphere_red   = mWorld->getObject(mWorld->getNumObjects()-3);
         robotics::Object* sphere_blue  = mWorld->getObject(mWorld->getNumObjects()-2); 
         robotics::Object* sphere_green = mWorld->getObject(mWorld->getNumObjects()-1);
-        robotics::Object* star_yellow = mWorld->getObject(mWorld->getNumObjects()-5); 
-        Thrower thrower(*mWorld, mTimeText, *sphere_red, *sphere_green, *sphere_blue, *star_yellow);
+
+        Thrower thrower(*mWorld, mTimeText, *sphere_red, *sphere_green, *sphere_blue, *star_purple);
         
-        //find robot position to determine direction of sphere_red
-        VectorXd robotPos(3);
         //get current robot position
         double x,y,z;
         mWorld->getRobot(mRobotId)->getPositionXYZ(x,y,z);
-        robotPos << x, y, z;
+        
+        //find robot position to determine direction of sphere_red
+        VectorXd robotPos(3);robotPos << x, y, z;
 
-        //the target position will be a random location reachable by the robot arm
-        //velocities are calculated to reach such position
-        thrower.throwObject(robotPos);
+        //the target position will be a random reachable location (rrp)
+        //default case shown here: throwObject(robotPos, double noise, double prediction_time, int maxnodes, bool approach)
+        thrower.throwObject(robotPos, 0.2, 0.8, 5000, CLOSEST_RRT);
         thrower.SetThrowTimeline();
     } else {
       std::cout << "(!) World must be loaded!!!!!!!!!!!"<< std::endl;

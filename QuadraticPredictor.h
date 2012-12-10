@@ -20,7 +20,7 @@ class QuadraticPredictor : public Predictor {
 private:
     std::list<Eigen::VectorXd> predictedPath;
 public:
-    QuadraticPredictor(std::list<Eigen::VectorXd> observedPath);
+    QuadraticPredictor(std::list<Eigen::VectorXd> observedPath, double time);
     virtual std::list<Eigen::VectorXd> getPredictedPath();
     virtual ~QuadraticPredictor(){};
 };

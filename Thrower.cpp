@@ -28,9 +28,49 @@ Thrower::Thrower(robotics::World &_world, wxTextCtrl *_timeText,
   mAimStar(_aimStar){
 }
 
-// The effect of this method is that it will fill the path value
-void Thrower::throwObject(VectorXd pos) {
 
+//get random double between fmin and fmax
+double fRand(double min, double max) {
+    double f = (double)rand() / RAND_MAX;
+    return min + f * (max - min);
+}
+
+
+list<VectorXd> addSensorNoise(list<VectorXd> path, double maxNoise){
+        for( list<VectorXd>::iterator it = path.begin(); it != path.end(); it++){
+                VectorXd noise(3); noise << fRand(0.0,maxNoise), fRand(0.0,maxNoise), fRand(0.0,maxNoise);
+                *it = *it + noise;
+        }
+        return path;        
+}
+
+VectorXd findRandomReachablePosition(VectorXd pos){
+       VectorXd target(3);
+       
+       srand(time(NULL));
+       //get random reachable location; note generated z >= current z (i.e. arm is on table)
+       target << fRand(pos[0] - ARM_LENGTH/2, pos[0] + ARM_LENGTH/2), 
+                 fRand(pos[1] - ARM_LENGTH/2, pos[1] + ARM_LENGTH/2),
+                 fRand(pos[2]+1, pos[2] + ARM_LENGTH/2);
+       PRINT(target); 
+       return target;
+}
+
+//NOTE: this method could be combined with the previous one, but might just better to have it separate
+VectorXd findRandomStartPosition(VectorXd pos){
+        VectorXd start(3);
+        srand(time(NULL));
+        //get random start locations; chose a bounded random area in front of the arm
+        start << fRand(pos[0] - AXIS_SHIFT, pos[0] + AXIS_SHIFT), 
+                 fRand(pos[1] - AXIS_SHIFT, pos[1] + AXIS_SHIFT),
+                 pos[2];
+        PRINT(start); 
+        return start;
+}
+
+// The effect of this method is that it will fill the path value
+void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, int maxnodes, bool approach) {
+       
   //get random reachable position (rrp) for ball's projectile motion
   VectorXd rrp = findRandomReachablePosition(pos);
   
@@ -48,7 +88,7 @@ void Thrower::throwObject(VectorXd pos) {
   
   //calculate motion in steps
   objectPath = projectileMotion(rstart, vels, acc);
-  perceivedPath = addSensorNoise(objectPath, 0.1);
+  perceivedPath = addSensorNoise(objectPath, noise);
   //objectPath = straightMotion(rstart, rrp);
   
   aims.clear();
@@ -58,7 +98,7 @@ void Thrower::throwObject(VectorXd pos) {
   for(list<VectorXd>::iterator it = perceivedPath.begin(); it != perceivedPath.end(); it++){
     list<VectorXd>::iterator it_after = it;
     it_after++;
-    QuadraticPredictor predictor(list<VectorXd>(perceivedPath.begin(), it_after));
+    QuadraticPredictor predictor(list<VectorXd>(perceivedPath.begin(), it_after), prediction_time);
     predictedPaths.push_back(predictor.getPredictedPath());
     predictedPath.push_back(predictedPaths.back().back());
   }
@@ -78,10 +118,9 @@ void Thrower::throwObject(VectorXd pos) {
       VectorXd qTemp;
       if(arm.GoToXYZ(joints, *it, qTemp)){
         double dist_other = JointMover::jointSpaceDistance(joints, qTemp);
-        ECHO("1");
+
         if(dist_other < dist_now){
           closestXYZ = *it;
-          ECHO("2");
           qClosest = qTemp;
         }
       }
@@ -90,61 +129,17 @@ void Thrower::throwObject(VectorXd pos) {
     VectorXd jointsGoal = qClosest.norm() > 100000 ? joints : qClosest;
     
     //create path planner
-    PathPlanner *planner = new PathPlanner(mWorld, false, jointSpeeds*dt);
+    PathPlanner planner(mWorld, false, jointSpeeds*dt);
     VectorXi mLinks = mWorld.getRobot(mRobotId)->getQuickDofsIndices();
     
-    if(planner->planPath(mRobotId,mLinks, joints, jointsGoal, false, false, true, false, 5000)){ 
-        list<VectorXd>::iterator ite = planner->path.begin();
+    if(planner.planPath(mRobotId,mLinks, joints, jointsGoal, false, false, true, false, maxnodes)){ 
+        list<VectorXd>::iterator ite = planner.path.begin();
         joints = *(++ite);
     }
     //joints = JointMover::jointSpaceMovement(joints, jointsGoal);
     aims.push_back(closestXYZ);
   }
 }
-
-//get random double between fmin and fmax
-double fRand(double min, double max) {
-    double f = (double)rand() / RAND_MAX;
-    return min + f * (max - min);
-}
-
-
-list<VectorXd> Thrower::addSensorNoise(list<VectorXd> path, double maxNoise){
-        for( list<VectorXd>::iterator it = path.begin(); it != path.end(); it++){
-                VectorXd noise(3); noise << fRand(0.0,maxNoise), fRand(0.0,maxNoise), fRand(0.0,maxNoise);
-                //ECHO("before:")
-                //PRINT(*it)
-                *it = *it + noise;
-                //ECHO("after:")
-                //PRINT(*it)
-        }
-        return path;        
-}
-
-VectorXd Thrower::findRandomReachablePosition(VectorXd pos){
-       VectorXd target(3);
-       
-       srand(time(NULL));
-       //get random reachable location; note generated z >= current z (i.e. arm is on table)
-       target << fRand(pos[0] - ARM_LENGTH/2, pos[0] + ARM_LENGTH/2), 
-                 fRand(pos[1] - ARM_LENGTH/2, pos[1] + ARM_LENGTH/2),
-                 fRand(pos[2]+1, pos[2] + ARM_LENGTH/2);
-       PRINT(target); 
-       return target;
-}
-
-//NOTE: this method could be combined with the previous one, but might just better to have it separate
-VectorXd Thrower::findRandomStartPosition(VectorXd pos){
-        VectorXd start(3);
-        srand(time(NULL));
-        //get random start locations; chose a bounded random area in front of the arm
-        start << fRand(pos[0] - AXIS_SHIFT, pos[0] + AXIS_SHIFT), 
-                 fRand(pos[1] - AXIS_SHIFT, pos[1] + AXIS_SHIFT),
-                 pos[2];
-        PRINT(start); 
-        return start;
-}
-
 
 
 void Thrower::SetThrowTimeline(){
