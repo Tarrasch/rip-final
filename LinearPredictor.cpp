@@ -13,6 +13,13 @@
 using namespace std;
 using namespace Eigen;
 
+VectorXd sum(Path::iterator b, Path::iterator e) {
+  assert(b!=e);
+  VectorXd start = *(b++);
+  while(b!=e){ start += *(b++); }
+  return start;
+}
+
 Path LinearPredictor::getPredictedPath(Path observedPath, double time){
 	// Only continue if the observed path is greater than 0
 	int n = observedPath.size();
@@ -21,8 +28,8 @@ Path LinearPredictor::getPredictedPath(Path observedPath, double time){
 	
 	VectorXd vel(3); vel<<0,0,0;
   if(2*m >= n){
-    VectorXd last = accumulate(observedPath.end()-m, observedPath.end(), vel)/m;
-    VectorXd beforeLast = accumulate(observedPath.end()-(2*m), observedPath.end()-m, vel)/m;
+    VectorXd last = sum(observedPath.end()-m, observedPath.end())*(1/m);
+    VectorXd beforeLast = sum(observedPath.end()-(2*m), observedPath.end()-m)*(1/m);
     vel = (last - beforeLast)*(1/dt);
   }
 	VectorXd acc(3); acc<<0,0,0;
