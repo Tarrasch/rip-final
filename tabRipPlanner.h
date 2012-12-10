@@ -17,7 +17,6 @@
 #include <dynamics/BodyNodeDynamics.h>
 #include <kinematics/Joint.h>
 #include "PathPlanner.h"
-#include <kinematics/Joint.h> 
 #include <kinematics/Dof.h> 
 
 #include <iostream>
@@ -42,6 +41,11 @@ public:
     PathPlanner *mPlanner;
 
     wxTextCtrl *mTimeText;
+    wxTextCtrl *mNoiseText;
+    wxTextCtrl *mIterationsText;
+    wxTextCtrl *mPredictorText;
+    wxTextCtrl *mPredTimeText;
+    wxTextCtrl *mNodesText;
 
     // public vars to capture external selection stuff
     robotics::Object* mSelectedObject;

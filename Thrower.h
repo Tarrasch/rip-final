@@ -8,6 +8,10 @@
 #include <vector>
 #include <list>
 #include <robotics/World.h>
+#include <kinematics/Joint.h>
+#include <kinematics/Dof.h> 
+#include <kinematics/BodyNode.h> 
+#include <kinematics/Marker.h> 
 #include <wx/wx.h>
 #define CLOSEST_RRT true
 #define MULTI_RRT false
@@ -41,8 +45,8 @@ public:
     Thrower(robotics::World &_world, wxTextCtrl *_timeText,
         robotics::Object &_sphereActual, robotics::Object &_spherePerceived, robotics::Object &_spherePredicted, robotics::Object &_aimStar);
 
-    void throwObject(VectorXd pos, double noise, double prediction_time, int maxnodes, bool approach);
-    void SetThrowTimeline();
+    void throwObject(VectorXd pos, double noise, double prediction_time, double prediction_type, double maxnodes, bool approach);
+    double SetThrowTimeline(bool addFrames);
 };
 #endif
 

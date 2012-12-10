@@ -69,8 +69,8 @@ bool PathPlanner::planPath( int _robotId,
 
   //world->mRobots[_robotId]->setQuickDofs( _start ); // Other quick way
   world->getRobot(_robotId)->setDofs( _start, _links );
-  /*if( world->checkCollision() )
-    return false;*/
+  if( world->checkCollision() )
+    return false;
 
   world->getRobot(_robotId)->setDofs( _goal, _links );
   if( world->checkCollision() )

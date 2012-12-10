@@ -20,8 +20,9 @@
 #include <Tabs/AllTabs.h>
 #include <GRIPApp.h>
 #include "Thrower.h" 
-#define PRINT(x) std::cout << #x << " = " << x << std::endl;
+#define PRINT(x) std::cout << "\t" << #x << "=" << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
+#define STOP_THRESHOLD 0.05
 
 /* Quick intro to adding tabs:
  * 1- Copy template cpp and header files and replace with new class name
@@ -139,10 +140,6 @@ RipPlannerTab::RipPlannerTab( wxWindow *parent, const wxWindowID id,
 		    0, // make horizontally unstretchable
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
-    col2Sizer->Add( new wxButton(this, button_empty1, wxT("Check collision")),
-		    0, // make horizontally unstretchable
-		    wxALL, // make border all around (implicit top alignment)
-		    1 ); // set border width to 1, so start buttons are close together
 
 
     // Add col2Sizer to the configuration box
@@ -160,19 +157,46 @@ RipPlannerTab::RipPlannerTab( wxWindow *parent, const wxWindowID id,
 		    0, // make horizontally unstretchable
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
-    col3Sizer->Add( new wxButton(this, button_empty2, wxT("Empty 2")),
-		    0, // make horizontally unstretchable
-		    wxALL, // make border all around (implicit top alignment)
-		    1 ); // set border width to 1, so start buttons are close together
-    // HACK, try add throw button
-    col3Sizer->Add( new wxButton(this, button_TestThrow, wxT("Test Throw")),
-		    0, // make horizontally unstretchable
-		    wxALL, // make border all around (implicit top alignment)
-		    1 ); // set border width to 1, so start buttons are close together
     configureBoxSizer->Add( col3Sizer,
 			    1, // size evenly with radio box and checkboxes
 			    wxALIGN_NOT ); // no border and center horizontally
-
+    
+    // Create sizer for test functions
+    wxBoxSizer *colTestSizer = new wxBoxSizer(wxVERTICAL);
+    mNoiseText = new wxTextCtrl(this, wxID_HIGHEST,
+      wxT("Noise"), wxDefaultPosition, wxSize(100,20),
+      wxTE_MULTILINE | wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+    colTestSizer->Add(mNoiseText , 0, wxALL,1);
+    
+    mIterationsText = new wxTextCtrl(this, wxID_HIGHEST+1,
+      wxT("Iterations"), wxDefaultPosition, wxSize(100,20),
+      wxTE_MULTILINE | wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+    colTestSizer->Add(mIterationsText, 0, wxALL,1);
+    
+    mPredictorText =  new wxTextCtrl(this, wxID_HIGHEST+2,
+      wxT("Predictor(0,1)"), wxDefaultPosition, wxSize(100,20),
+      wxTE_MULTILINE | wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+    colTestSizer->Add(mPredictorText, 0, wxALL,1);
+    
+    mPredTimeText = new wxTextCtrl(this, wxID_HIGHEST+3,
+      wxT("Pred. Time"), wxDefaultPosition, wxSize(100,20),
+      wxTE_MULTILINE | wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+    colTestSizer->Add(mPredTimeText, 0, wxALL,1);
+    
+    mNodesText = new wxTextCtrl(this, wxID_HIGHEST+4,
+      wxT("RRT Nodes"), wxDefaultPosition, wxSize(100,20),
+      wxTE_MULTILINE | wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+    colTestSizer->Add(mNodesText , 0, wxALL,1);
+    
+    colTestSizer->Add( new wxButton(this, button_TestThrow, wxT("Test Throw")),
+		    0, // make horizontally unstretchable
+		    wxALL, // make border all around (implicit top alignment)
+		    1 ); // set border width to 1, so start buttons are close together
+    configureBoxSizer->Add( colTestSizer,
+			    1, // size evenly with radio box and checkboxes
+			    wxALIGN_NOT ); // no border and center horizontally
+    
+    
     // Add this box to parent sizer
     sizerFull->Add( configureBoxSizer,
 		    4, // 4-to-1 ratio with execute sizer, since it just has 3 buttons
@@ -404,9 +428,34 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
         VectorXd robotPos(3);robotPos << x, y, z;
 
         //the target position will be a random reachable location (rrp)
-        //default case shown here: throwObject(robotPos, double noise, double prediction_time, int maxnodes, bool approach)
-        thrower.throwObject(robotPos, 0.2, 0.8, 5000, CLOSEST_RRT);
-        thrower.SetThrowTimeline();
+        //default case shown here: throwObject(robotPos, double noise, double prediction_time, int prediction_type, int maxnodes, bool approach)
+        double stop_count = 0;
+        
+        //parameters from user, i.e., ****TEST SUITE****
+        double noise;
+        double maxiterations;
+        double it;
+        double ptime;
+        double ptype;
+        double tnodes;
+        
+        mNoiseText->GetValue().ToDouble(&noise);
+        mIterationsText->GetValue().ToDouble(&maxiterations);
+        mPredictorText->GetValue().ToDouble(&ptype);
+        mPredTimeText->GetValue().ToDouble(&ptime);
+        mNodesText->GetValue().ToDouble(&tnodes);
+        
+        for(it=0; it < maxiterations; it++){
+                thrower.throwObject(robotPos, noise, ptime, ptype, tnodes, CLOSEST_RRT);
+                stop_count = (thrower.SetThrowTimeline(false) < STOP_THRESHOLD) ? stop_count+1 : stop_count;
+        }
+        /*TEST OUTPUTS*/
+        ECHO("\n");
+        ECHO("***PERCENTAGE SUCCESS***");
+        PRINT(stop_count);
+        PRINT(maxiterations);
+        double percentage = (stop_count/maxiterations)*100.0;
+        PRINT(percentage);
     } else {
       std::cout << "(!) World must be loaded!!!!!!!!!!!"<< std::endl;
     }

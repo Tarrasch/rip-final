@@ -13,7 +13,7 @@
 #include "QuadraticPredictor.h"
 #include "Predictor.h"
 #include "PathPlanner.h"
-#define PRINT(x) std::cout << #x << " = " << x << std::endl;
+#define PRINT(x) std::cout << "\t" << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
 #define ARM_LENGTH 1.10
 #define AXIS_SHIFT 2.0
@@ -52,7 +52,7 @@ VectorXd findRandomReachablePosition(VectorXd pos){
        target << fRand(pos[0] - ARM_LENGTH/2, pos[0] + ARM_LENGTH/2), 
                  fRand(pos[1] - ARM_LENGTH/2, pos[1] + ARM_LENGTH/2),
                  fRand(pos[2]+1, pos[2] + ARM_LENGTH/2);
-       PRINT(target); 
+       //PRINT(target); 
        return target;
 }
 
@@ -64,13 +64,24 @@ VectorXd findRandomStartPosition(VectorXd pos){
         start << fRand(pos[0] - AXIS_SHIFT, pos[0] + AXIS_SHIFT), 
                  fRand(pos[1] - AXIS_SHIFT, pos[1] + AXIS_SHIFT),
                  pos[2];
-        PRINT(start); 
+        //PRINT(start); 
         return start;
 }
 
 // The effect of this method is that it will fill the path value
-void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, int maxnodes, bool approach) {
-       
+void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, double prediction_type, double maxnodes, bool approach) {
+  
+  //make sure objects are in start locations to allow RRT to run multiple times
+  mSphereActual.setPositionXYZ(0, 3, 1);
+  mSphereActual.update();
+  mSpherePerceived.setPositionXYZ(0, 4, 1);
+  mSpherePerceived.update();
+  mSpherePredicted.setPositionXYZ(0, 5, 1);
+  mSpherePredicted.update();
+  mAimStar.setPositionXYZ(0, 6, 1);
+  mAimStar.update();
+  
+  
   //get random reachable position (rrp) for ball's projectile motion
   VectorXd rrp = findRandomReachablePosition(pos);
   
@@ -94,7 +105,8 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, in
   aims.clear();
   predictedPath.clear();
   predictedPaths.clear();
-
+  
+  //predict ball position using either linear or quadratic regression
   for(list<VectorXd>::iterator it = perceivedPath.begin(); it != perceivedPath.end(); it++){
     list<VectorXd>::iterator it_after = it;
     it_after++;
@@ -102,12 +114,13 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, in
     predictedPaths.push_back(predictor.getPredictedPath());
     predictedPath.push_back(predictedPaths.back().back());
   }
-
+  
+  //calculate best path to intercept moving sphere
   JointMover arm(mWorld, mRobotId);
   jointPath.clear();
-  VectorXd joints = mWorld.getRobot(0)->getQuickDofs();
- 
-  bool GoToXYZ( VectorXd _qStart, VectorXd _targetXYZ, VectorXd &_qResult, double &_distance);
+  VectorXd joints = mWorld.getRobot(mRobotId)->getQuickDofs();
+  VectorXi mLinks = mWorld.getRobot(mRobotId)->getQuickDofsIndices();
+  
   for( list<Path>::iterator it_paths = predictedPaths.begin(); it_paths != predictedPaths.end(); it_paths++ ) {
     Path &path = *it_paths;
     VectorXd closestXYZ = path.back();
@@ -130,7 +143,6 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, in
     
     //create path planner
     PathPlanner planner(mWorld, false, jointSpeeds*dt);
-    VectorXi mLinks = mWorld.getRobot(mRobotId)->getQuickDofsIndices();
     
     if(planner.planPath(mRobotId,mLinks, joints, jointsGoal, false, false, true, false, maxnodes)){ 
         list<VectorXd>::iterator ite = planner.path.begin();
@@ -142,7 +154,7 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, in
 }
 
 
-void Thrower::SetThrowTimeline(){
+double Thrower::SetThrowTimeline(bool addFrames){
     if( objectPath.size() == 0 ) {
         cout << "--(!) Must create a nonempty plan before setting timeline (!)--" << endl;
         return;
@@ -161,6 +173,12 @@ void Thrower::SetThrowTimeline(){
     list<VectorXd>::iterator it_pred;
     list<VectorXd>::iterator it_percvd;
     list<VectorXd>::iterator it_aim;
+    
+    //calculate distance between end effector and sphere
+    VectorXd endCoord(3); mWorld.getRobot(mRobotId)->getBodyNodePositionXYZ("FT", endCoord[0], endCoord[1], endCoord[2]);
+    VectorXd sphereCoord(3);mSphereActual.getPositionXYZ(sphereCoord[0], sphereCoord[1], sphereCoord[2]);
+    double min_difference = (sphereCoord - endCoord).norm();
+    
     for( list<VectorXd>::iterator it = objectPath.begin(), it_j = jointPath.begin(),it_percvd = perceivedPath.begin(), it_pred = predictedPath.begin(), it_aim = aims.begin();
          it != objectPath.end() && it_pred != predictedPath.end(); it++, it_j++, it_percvd++, it_pred++, it_aim++ ) {
         
@@ -188,6 +206,17 @@ void Thrower::SetThrowTimeline(){
         //update robot and world frame
         mWorld.getRobot(mRobotId)->setQuickDofs( *it_j );
         mWorld.getRobot(mRobotId)->update();
-        frame->AddWorld( &mWorld );
+        
+        if(addFrames){ frame->AddWorld( &mWorld );}
+        
+        //update min difference
+        mWorld.getRobot(mRobotId)->getBodyNodePositionXYZ("FT", endCoord[0], endCoord[1], endCoord[2]);
+        mSphereActual.getPositionXYZ(sphereCoord[0], sphereCoord[1], sphereCoord[2]);
+        //PRINT(sphereCoord)
+        //PRINT(endCoord)
+        PRINT((sphereCoord-endCoord).norm());
+        if((sphereCoord-endCoord).norm() < min_difference){min_difference = (sphereCoord-endCoord).norm();}
     }
+    
+    return min_difference;
 }
