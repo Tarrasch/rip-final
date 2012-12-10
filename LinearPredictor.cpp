@@ -18,11 +18,14 @@ Path LinearPredictor::getPredictedPath(Path observedPath, double time){
 	int n = observedPath.size();
 	assert(n > 0);
 	const int m = 5;
-	
+
 	VectorXd vel(3); vel<<0,0,0;
-  if(2*m >= n){
+  if(n >= 2*m){
+    ECHO("HII");
     VectorXd last = accumulate(observedPath.end()-m, observedPath.end(), vel)/m;
+    PRINT(last);
     VectorXd beforeLast = accumulate(observedPath.end()-(2*m), observedPath.end()-m, vel)/m;
+    PRINT(beforeLast);
     vel = (last - beforeLast)*(1/dt);
   }
 	VectorXd acc(3); acc<<0,0,0;

@@ -172,27 +172,27 @@ RipPlannerTab::RipPlannerTab( wxWindow *parent, const wxWindowID id,
     // Create sizer for test functions
     wxBoxSizer *colTestSizer = new wxBoxSizer(wxVERTICAL);
     mNoiseText = new wxTextCtrl(this, wxID_HIGHEST,
-      wxT("Noise(0.0)"), wxDefaultPosition, wxSize(120,20),
+      wxT("0.0"), wxDefaultPosition, wxSize(80,20),
        wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mNoiseText , 0, wxALL,1);
     
     mIterationsText = new wxTextCtrl(this, wxID_HIGHEST+1,
-      wxT("Iterations(1)"), wxDefaultPosition, wxSize(120,20),
+      wxT("1"), wxDefaultPosition, wxSize(80,20),
        wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mIterationsText, 0, wxALL,1);
     
     mPredictorText =  new wxTextCtrl(this, wxID_HIGHEST+2,
-      wxT("Predictor(0,1)"), wxDefaultPosition, wxSize(120,20),
+      wxT("0"), wxDefaultPosition, wxSize(80,20),
       wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mPredictorText, 0, wxALL,1);
     
     mPredTimeText = new wxTextCtrl(this, wxID_HIGHEST+3,
-      wxT("Pred. Time(0.8)"), wxDefaultPosition, wxSize(120,20),
+      wxT("0.8"), wxDefaultPosition, wxSize(80,20),
        wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mPredTimeText, 0, wxALL,1);
     
     mNodesText = new wxTextCtrl(this, wxID_HIGHEST+4,
-      wxT("RRT Nodes(5000)"), wxDefaultPosition, wxSize(120,20),
+      wxT("500"), wxDefaultPosition, wxSize(80,20),
       wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     
     colTestSizer->Add(mNodesText , 0, wxALL,1);
