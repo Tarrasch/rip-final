@@ -21,6 +21,7 @@
 
 #include <iostream>
 
+const double STOP_THRESHOLD = 0.05;
 /**
  * @class RipTabPlanner
  * @brief Implements the RIP Tab + Planners

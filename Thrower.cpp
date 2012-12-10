@@ -2,6 +2,7 @@
 #include "Thrower.h"
 #include "newtonianPhysics.h"
 
+#include <numeric>
 #include <wx/wx.h>
 #include <GUI/Viewer.h>
 #include <GUI/GUI.h>
@@ -134,18 +135,23 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, Pr
       int i = 0;
       for( Path::iterator it = path.begin(); it != path.end(); it++, i+=1 ) {
         valid[i] = arm.GoToXYZ(joints, *it, qs[i]);
-        qReachables.push_back(qs[i]);
-        xyzReachables.push_back(*it);
+        if(valid[i]){
+           qReachables.push_back(qs[i]);
+           xyzReachables.push_back(*it);
+        }
       }
     }
-
     if(approach) {
-      bool greedy = true;
-      PathPlanner planner(mWorld, false, jointSpeeds*dt);
-      int res = planner.planMultiGoalRrt(mRobotId, links, joints, qReachables, greedy, 5000);
-      VectorXd closestXYZ = res == -1 ? path.back() : xyzReachables[res];
-      joints = res == -1 ? joints : *(++(planner.path.begin()));
-      aims.push_back(closestXYZ);
+      VectorXd aimXYZ = path.back();
+      if(accumulate(valid.begin(), valid.end(), 0) > 0){
+              bool greedy = true;
+              PathPlanner planner(mWorld, false, jointSpeeds*dt);
+              int res = planner.planMultiGoalRrt(mRobotId, links, joints, qReachables, greedy, maxnodes);
+              aimXYZ = res == -1 ? path.back() : xyzReachables[res];
+              list<VectorXd>::iterator ite = planner.path.begin();
+              joints = res == -1 ? joints : *(++ite);
+      }
+       aims.push_back(aimXYZ);
     }
     else{
       VectorXd closestXYZ = path.back();
@@ -171,7 +177,6 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, Pr
 
       aims.push_back(closestXYZ);
     }
-    //joints = JointMover::jointSpaceMovement(joints, jointsGoal);
   }
 }
 
@@ -181,9 +186,10 @@ double Thrower::SetThrowTimeline(bool addFrames){
         cout << "--(!) Must create a nonempty plan before setting timeline (!)--" << endl;
         return 0.0;
     }
+    
     double T;
     mTimeText->GetValue().ToDouble(&T);
-
+    
     int numsteps = objectPath.size();
     double increment = T/(double)numsteps;
     cout << "-->(+) Updating Timeline - Increment: " << increment

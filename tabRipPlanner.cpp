@@ -25,7 +25,7 @@
 #include "QuadraticPredictor.h"
 #define PRINT(x) std::cout << "\t" << #x << "=" << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
-#define STOP_THRESHOLD 0.05
+
 
 /* Quick intro to adding tabs:
  * 1- Copy template cpp and header files and replace with new class name
@@ -458,6 +458,7 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
         if(ptype == 0){ predictor = new LinearPredictor();} 
         else{ predictor = new QuadraticPredictor();} 
         
+        double begin = clock();
         for(it=0; it < maxiterations; it++){
                 thrower.throwObject(robotPos, noise, ptime, *predictor, tnodes, mApproach);
                 stop_count = (thrower.SetThrowTimeline(true) < STOP_THRESHOLD) ? stop_count+1 : stop_count;
@@ -469,6 +470,10 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
         PRINT(maxiterations);
         double percentage = (stop_count/maxiterations)*100.0;
         PRINT(percentage);
+        ECHO("***ELAPSED TIME***");
+        double elapsed = (clock()-begin);
+        PRINT(elapsed);
+        
     } else {
       std::cout << "(!) World must be loaded!!!!!!!!!!!"<< std::endl;
     }

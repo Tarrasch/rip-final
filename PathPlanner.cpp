@@ -231,22 +231,29 @@ int PathPlanner::planMultiGoalRrt( int _robotId,
                                      bool _greedy,
                                      unsigned int _maxNodes ) {
   ECHO("BEGIN planMultiGoalRrt");
-
+  
   RRT rrt( world, _robotId, _links, _start, stepSize );
   RRT::StepResult result = RRT::STEP_PROGRESS;
   int closest = -1;
-  
+ 
   double smallestGap = DBL_MAX;
+  for(int i = 0; i < _goals.size(); i++){
+     double rrtGap = rrt.getGap( _goals[i] );
+     if(rrtGap < smallestGap){
+        closest = i;
+        smallestGap = rrtGap;
+     }
+  }  
   while ( result != RRT::STEP_REACHED && smallestGap > stepSize ) {
 
     if( rand()%2 == 1 && _greedy ) {
       const VectorXd &_goal = _goals[rand()%_goals.size()];
       rrt.tryStep(_goal);
-      ECHO("Greedy!");
+      //ECHO("Greedy!");
     } 
     else {
       rrt.tryStep();
-      ECHO("Simple!");
+      //ECHO("Simple!");
     }
     
     if( _maxNodes > 0 && rrt.getSize() > _maxNodes*2 ) {
@@ -256,8 +263,11 @@ int PathPlanner::planMultiGoalRrt( int _robotId,
 
     double bestGap = 1e100;
     for(int i = 0; i < _goals.size(); i++){
-      bestGap = min(bestGap, rrt.getGap( _goals[i] ));
-      closest = i;
+      double rrtGap = rrt.getGap( _goals[i] );
+      if(rrtGap < bestGap){
+        closest = i;
+        bestGap = rrtGap;
+      }
     }
     if( bestGap  < smallestGap ) {
       smallestGap = bestGap;
@@ -265,10 +275,11 @@ int PathPlanner::planMultiGoalRrt( int _robotId,
       std::cout <<"--RRT Size: " << rrt.getSize() << std::endl;
     }
   } // End of while
-
+  
   /// Save path
   printf(" --> Reached goal! : Gap: %.3f \n", rrt.getGap( _goals[closest] ) );
   rrt.tracePath( rrt.activeNode, path, false );
+  path.push_back(_goals[closest]);
   return closest;
 }
 
