@@ -224,6 +224,55 @@ bool PathPlanner::planBidirectionalRrt( int _robotId,
   return true;
 }
 
+int PathPlanner::planMultiGoalRrt( int _robotId,
+                                     const Eigen::VectorXi &_links,
+                                     const Eigen::VectorXd &_start,
+                                     const vector<Eigen::VectorXd> &_goals,
+                                     bool _greedy,
+                                     unsigned int _maxNodes ) {
+  ECHO("BEGIN planMultiGoalRrt");
+
+  RRT rrt( world, _robotId, _links, _start, stepSize );
+  RRT::StepResult result = RRT::STEP_PROGRESS;
+  int closest = -1;
+  
+  double smallestGap = DBL_MAX;
+  while ( result != RRT::STEP_REACHED && smallestGap > stepSize ) {
+
+    if( rand()%2 == 1 && _greedy ) {
+      const VectorXd &_goal = _goals[rand()%_goals.size()];
+      rrt.tryStep(_goal);
+      ECHO("Greedy!");
+    } 
+    else {
+      rrt.tryStep();
+      ECHO("Simple!");
+    }
+    
+    if( _maxNodes > 0 && rrt.getSize() > _maxNodes*2 ) {
+      printf("--(!) Exceeded maximum of %d nodes. No path found (!)--\n", _maxNodes*2 );
+      return -1;
+    }
+
+    double bestGap = 1e100;
+    for(int i = 0; i < _goals.size(); i++){
+      bestGap = min(bestGap, rrt.getGap( _goals[i] ));
+      closest = i;
+    }
+    if( bestGap  < smallestGap ) {
+      smallestGap = bestGap;
+      std::cout << "--> [planner] Gap: " << smallestGap << "  Tree size: " << rrt.configVector.size() << std::endl;
+      std::cout <<"--RRT Size: " << rrt.getSize() << std::endl;
+    }
+  } // End of while
+
+  /// Save path
+  printf(" --> Reached goal! : Gap: %.3f \n", rrt.getGap( _goals[closest] ) );
+  rrt.tracePath( rrt.activeNode, path, false );
+
+  return closest;
+}
+
 
 /**
  * @function checkPathSegment

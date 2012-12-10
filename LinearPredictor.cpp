@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Eigen;
 
-LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath, double time){
+LinearPredictor::LinearPredictor(Path observedPath, double time){
 	int pathSize = observedPath.size();
 	
 	// Only continue if the observed path is greater than 0
@@ -26,7 +26,7 @@ LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath, double
 	p1 << 0,0,0;
 	
 	// Build an iterator over the path list
-	list<VectorXd>::iterator it = observedPath.end();
+	Path::iterator it = observedPath.end();
 	it--;
 	
 	// If there is only 1 path point (occurs at the very "start" of time.) just use that one point
@@ -76,6 +76,6 @@ LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath, double
 	predictedPath = projectileMotionWRandT(p2, vel, acc, 0, time);
 }
 
-std::list<Eigen::VectorXd> LinearPredictor::getPredictedPath(){
+Path LinearPredictor::getPredictedPath(){
         return predictedPath;
 }

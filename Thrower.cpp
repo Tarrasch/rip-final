@@ -36,8 +36,8 @@ double fRand(double min, double max) {
 }
 
 
-list<VectorXd> addSensorNoise(list<VectorXd> path, double maxNoise){
-        for( list<VectorXd>::iterator it = path.begin(); it != path.end(); it++){
+Path addSensorNoise(Path path, double maxNoise){
+        for( Path::iterator it = path.begin(); it != path.end(); it++){
                 VectorXd noise(3); noise << fRand(0.0,maxNoise), fRand(0.0,maxNoise), fRand(0.0,maxNoise);
                 *it = *it + noise;
         }
@@ -107,10 +107,10 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, do
   predictedPaths.clear();
   
   //predict ball position using either linear or quadratic regression
-  for(list<VectorXd>::iterator it = perceivedPath.begin(); it != perceivedPath.end(); it++){
-    list<VectorXd>::iterator it_after = it;
+  for(Path::iterator it = perceivedPath.begin(); it != perceivedPath.end(); it++){
+    Path::iterator it_after = it;
     it_after++;
-    QuadraticPredictor predictor(list<VectorXd>(perceivedPath.begin(), it_after), prediction_time);
+    QuadraticPredictor predictor(Path(perceivedPath.begin(), it_after), prediction_time);
     predictedPaths.push_back(predictor.getPredictedPath());
     predictedPath.push_back(predictedPaths.back().back());
   }
@@ -119,37 +119,60 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, do
   JointMover arm(mWorld, mRobotId);
   jointPath.clear();
   VectorXd joints = mWorld.getRobot(mRobotId)->getQuickDofs();
-  VectorXi mLinks = mWorld.getRobot(mRobotId)->getQuickDofsIndices();
+  VectorXi links = mWorld.getRobot(mRobotId)->getQuickDofsIndices();
   
   for( list<Path>::iterator it_paths = predictedPaths.begin(); it_paths != predictedPaths.end(); it_paths++ ) {
+    jointPath.push_back(joints);
     Path &path = *it_paths;
-    VectorXd closestXYZ = path.back();
-    VectorXd qClosest(7);
-    qClosest << 360, 360, 360, 360, 360, 360, 36000000000000000;
-    for( Path::iterator it = path.begin(); it != path.end(); it++ ) {
-      double dist_now = JointMover::jointSpaceDistance(joints, qClosest);
-      VectorXd qTemp;
-      if(arm.GoToXYZ(joints, *it, qTemp)){
-        double dist_other = JointMover::jointSpaceDistance(joints, qTemp);
-
-        if(dist_other < dist_now){
-          closestXYZ = *it;
-          qClosest = qTemp;
-        }
+    int n =  path.size();
+    vector<VectorXd> qs(n);
+    vector<bool> valid(n);
+    vector<VectorXd> xyzReachables;
+    vector<VectorXd> qReachables;
+    
+    {
+      int i = 0;
+      for( Path::iterator it = path.begin(); it != path.end(); it++, i+=1 ) {
+        valid[i] = arm.GoToXYZ(joints, *it, qs[i]);
+        qReachables.push_back(qs[i]);
+        xyzReachables.push_back(*it);
       }
     }
-    jointPath.push_back(joints);
-    VectorXd jointsGoal = qClosest.norm() > 100000 ? joints : qClosest;
-    
-    //create path planner
-    PathPlanner planner(mWorld, false, jointSpeeds*dt);
-    
-    if(planner.planPath(mRobotId,mLinks, joints, jointsGoal, false, false, true, false, maxnodes)){ 
-        list<VectorXd>::iterator ite = planner.path.begin();
-        joints = *(++ite);
+
+    bool multiGoalStrategy = false;
+    if(multiGoalStrategy) {
+      bool greedy = true;
+      PathPlanner planner(mWorld, false, jointSpeeds*dt);
+      int res = planner.planMultiGoalRrt(mRobotId, links, joints, qReachables, greedy, 5000);
+      VectorXd closestXYZ = res == -1 ? path.back() : xyzReachables[res];
+      joints = res == -1 ? joints : *(++(planner.path.begin()));
+      aims.push_back(closestXYZ);
+    }
+    else{
+      VectorXd closestXYZ = path.back();
+      VectorXd qClosest(7);
+      qClosest << 360, 360, 360, 360, 360, 360, 36000000000000000;
+      for(int i = 0; i < qReachables.size(); i++ ) {
+        double dist_now = JointMover::jointSpaceDistance(joints, qClosest);
+        double dist_other = JointMover::jointSpaceDistance(joints, qReachables[i]);
+        if(dist_other < dist_now){
+          closestXYZ = xyzReachables[i];
+          qClosest = qReachables[i];
+        }
+      }
+      VectorXd jointsGoal = qClosest.norm() > 100000 ? joints : qClosest;
+      
+      //create path planner
+      PathPlanner planner(mWorld, false, jointSpeeds*dt);
+      
+      if(planner.planPath(mRobotId,links, joints, jointsGoal, false, false, true, false, maxnodes)){ 
+          list<VectorXd>::iterator ite = planner.path.begin();
+          joints = *(++ite);
+      }
+
+      aims.push_back(closestXYZ);
     }
     //joints = JointMover::jointSpaceMovement(joints, jointsGoal);
-    aims.push_back(closestXYZ);
   }
 }
 
@@ -169,17 +192,17 @@ double Thrower::SetThrowTimeline(bool addFrames){
 
     frame->InitTimer( string("Throwing of object"),increment );
 
-    list<VectorXd>::iterator it_j;
-    list<VectorXd>::iterator it_pred;
-    list<VectorXd>::iterator it_percvd;
-    list<VectorXd>::iterator it_aim;
+    Path::iterator it_j;
+    Path::iterator it_pred;
+    Path::iterator it_percvd;
+    Path::iterator it_aim;
     
     //calculate distance between end effector and sphere
     VectorXd endCoord(3); mWorld.getRobot(mRobotId)->getBodyNodePositionXYZ("FT", endCoord[0], endCoord[1], endCoord[2]);
     VectorXd sphereCoord(3);mSphereActual.getPositionXYZ(sphereCoord[0], sphereCoord[1], sphereCoord[2]);
     double min_difference = (sphereCoord - endCoord).norm();
     
-    for( list<VectorXd>::iterator it = objectPath.begin(), it_j = jointPath.begin(),it_percvd = perceivedPath.begin(), it_pred = predictedPath.begin(), it_aim = aims.begin();
+    for( Path::iterator it = objectPath.begin(), it_j = jointPath.begin(),it_percvd = perceivedPath.begin(), it_pred = predictedPath.begin(), it_aim = aims.begin();
          it != objectPath.end() && it_pred != predictedPath.end(); it++, it_j++, it_percvd++, it_pred++, it_aim++ ) {
         
         VectorXd &pos = *it;

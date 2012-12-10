@@ -18,7 +18,7 @@ class Predictor {
 
 public:
 
-    virtual std::list<Eigen::VectorXd> getPredictedPath() = 0;
+    virtual Path getPredictedPath() = 0;
     virtual ~Predictor(){};
 };
 
