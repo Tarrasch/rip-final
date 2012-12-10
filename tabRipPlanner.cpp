@@ -164,28 +164,29 @@ RipPlannerTab::RipPlannerTab( wxWindow *parent, const wxWindowID id,
     // Create sizer for test functions
     wxBoxSizer *colTestSizer = new wxBoxSizer(wxVERTICAL);
     mNoiseText = new wxTextCtrl(this, wxID_HIGHEST,
-      wxT("Noise"), wxDefaultPosition, wxSize(100,20),
-      wxTE_MULTILINE | wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+      wxT("Noise(0.0)"), wxDefaultPosition, wxSize(100,20),
+       wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mNoiseText , 0, wxALL,1);
     
     mIterationsText = new wxTextCtrl(this, wxID_HIGHEST+1,
-      wxT("Iterations"), wxDefaultPosition, wxSize(100,20),
-      wxTE_MULTILINE | wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+      wxT("Iterations(1)"), wxDefaultPosition, wxSize(100,20),
+       wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mIterationsText, 0, wxALL,1);
     
     mPredictorText =  new wxTextCtrl(this, wxID_HIGHEST+2,
       wxT("Predictor(0,1)"), wxDefaultPosition, wxSize(100,20),
-      wxTE_MULTILINE | wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+      wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mPredictorText, 0, wxALL,1);
     
     mPredTimeText = new wxTextCtrl(this, wxID_HIGHEST+3,
-      wxT("Pred. Time"), wxDefaultPosition, wxSize(100,20),
-      wxTE_MULTILINE | wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+      wxT("Pred. Time(0.8)"), wxDefaultPosition, wxSize(100,20),
+       wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mPredTimeText, 0, wxALL,1);
     
     mNodesText = new wxTextCtrl(this, wxID_HIGHEST+4,
-      wxT("RRT Nodes"), wxDefaultPosition, wxSize(100,20),
-      wxTE_MULTILINE | wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+      wxT("RRT Nodes(5000)"), wxDefaultPosition, wxSize(100,20),
+      wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
+    
     colTestSizer->Add(mNodesText , 0, wxALL,1);
     
     colTestSizer->Add( new wxButton(this, button_TestThrow, wxT("Test Throw")),
@@ -447,7 +448,7 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
         
         for(it=0; it < maxiterations; it++){
                 thrower.throwObject(robotPos, noise, ptime, ptype, tnodes, CLOSEST_RRT);
-                stop_count = (thrower.SetThrowTimeline(false) < STOP_THRESHOLD) ? stop_count+1 : stop_count;
+                stop_count = (thrower.SetThrowTimeline(true) < STOP_THRESHOLD) ? stop_count+1 : stop_count;
         }
         /*TEST OUTPUTS*/
         ECHO("\n");
