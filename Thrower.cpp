@@ -153,8 +153,8 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, do
       VectorXd qClosest(7);
       qClosest << 360, 360, 360, 360, 360, 360, 36000000000000000;
       for(int i = 0; i < qReachables.size(); i++ ) {
-        double dist_now = JointMover::jointSpaceDistance(joints, qClosest);
-        double dist_other = JointMover::jointSpaceDistance(joints, qReachables[i]);
+        double dist_now = jointSpaceDistance(joints, qClosest);
+        double dist_other = jointSpaceDistance(joints, qReachables[i]);
         if(dist_other < dist_now){
           closestXYZ = xyzReachables[i];
           qClosest = qReachables[i];
@@ -180,7 +180,7 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, do
 double Thrower::SetThrowTimeline(bool addFrames){
     if( objectPath.size() == 0 ) {
         cout << "--(!) Must create a nonempty plan before setting timeline (!)--" << endl;
-        return;
+        return 0.0;
     }
     double T;
     mTimeText->GetValue().ToDouble(&T);

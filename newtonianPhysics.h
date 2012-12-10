@@ -6,6 +6,7 @@
 #include <list>
 #include <Eigen/LU>
 #include <Eigen/Core>
+#include <vector>
 
 using namespace std;
 using namespace Eigen;
