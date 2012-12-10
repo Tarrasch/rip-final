@@ -17,8 +17,6 @@ using namespace Eigen;
 
 class LinearPredictor : public Predictor {
 
-private:
-    Path predictedPath;
 public:
     virtual Path getPredictedPath(Path observedPath, double time);
     virtual ~LinearPredictor(){};
