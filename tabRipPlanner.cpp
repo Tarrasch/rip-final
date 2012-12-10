@@ -20,6 +20,9 @@
 #include <Tabs/AllTabs.h>
 #include <GRIPApp.h>
 #include "Thrower.h" 
+#include "Predictor.h"
+#include "LinearPredictor.h"
+#include "QuadraticPredictor.h"
 #define PRINT(x) std::cout << "\t" << #x << "=" << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
 #define STOP_THRESHOLD 0.05
@@ -46,6 +49,7 @@ enum planTabEvents {
 	checkbox_beGreedy,
 	checkbox_useConnect,
 	checkbox_useSmooth,
+	checkbox_useMultiGoal,
 	slider_Time,
   button_TestThrow
 
@@ -84,6 +88,7 @@ RipPlannerTab::RipPlannerTab( wxWindow *parent, const wxWindowID id,
     mConnectMode = false;
     mSmooth = false;
     mPlanner = NULL;
+    mApproach = false;
 
     sizerFull = new wxBoxSizer( wxHORIZONTAL );
 
@@ -140,8 +145,10 @@ RipPlannerTab::RipPlannerTab( wxWindow *parent, const wxWindowID id,
 		    0, // make horizontally unstretchable
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
-
-
+    col2Sizer->Add( new wxCheckBox(this, checkbox_useMultiGoal, _T("Multi-Goal RRT")),
+		    1, // vertical stretch evenly
+		    wxALIGN_NOT,
+		    0 );
     // Add col2Sizer to the configuration box
     configureBoxSizer->Add( col2Sizer,
 			    1, // takes half the space of the configure box
@@ -157,6 +164,7 @@ RipPlannerTab::RipPlannerTab( wxWindow *parent, const wxWindowID id,
 		    0, // make horizontally unstretchable
 		    wxALL, // make border all around (implicit top alignment)
 		    1 ); // set border width to 1, so start buttons are close together
+    	    
     configureBoxSizer->Add( col3Sizer,
 			    1, // size evenly with radio box and checkboxes
 			    wxALIGN_NOT ); // no border and center horizontally
@@ -164,27 +172,27 @@ RipPlannerTab::RipPlannerTab( wxWindow *parent, const wxWindowID id,
     // Create sizer for test functions
     wxBoxSizer *colTestSizer = new wxBoxSizer(wxVERTICAL);
     mNoiseText = new wxTextCtrl(this, wxID_HIGHEST,
-      wxT("Noise(0.0)"), wxDefaultPosition, wxSize(100,20),
+      wxT("Noise(0.0)"), wxDefaultPosition, wxSize(120,20),
        wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mNoiseText , 0, wxALL,1);
     
     mIterationsText = new wxTextCtrl(this, wxID_HIGHEST+1,
-      wxT("Iterations(1)"), wxDefaultPosition, wxSize(100,20),
+      wxT("Iterations(1)"), wxDefaultPosition, wxSize(120,20),
        wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mIterationsText, 0, wxALL,1);
     
     mPredictorText =  new wxTextCtrl(this, wxID_HIGHEST+2,
-      wxT("Predictor(0,1)"), wxDefaultPosition, wxSize(100,20),
+      wxT("Predictor(0,1)"), wxDefaultPosition, wxSize(120,20),
       wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mPredictorText, 0, wxALL,1);
     
     mPredTimeText = new wxTextCtrl(this, wxID_HIGHEST+3,
-      wxT("Pred. Time(0.8)"), wxDefaultPosition, wxSize(100,20),
+      wxT("Pred. Time(0.8)"), wxDefaultPosition, wxSize(120,20),
        wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     colTestSizer->Add(mPredTimeText, 0, wxALL,1);
     
     mNodesText = new wxTextCtrl(this, wxID_HIGHEST+4,
-      wxT("RRT Nodes(5000)"), wxDefaultPosition, wxSize(100,20),
+      wxT("RRT Nodes(5000)"), wxDefaultPosition, wxSize(120,20),
       wxTE_RICH , wxDefaultValidator, wxTextCtrlNameStr);
     
     colTestSizer->Add(mNodesText , 0, wxALL,1);
@@ -222,7 +230,7 @@ RipPlannerTab::RipPlannerTab( wxWindow *parent, const wxWindowID id,
 
 
     wxBoxSizer *timeSizer = new wxBoxSizer(wxHORIZONTAL);
-    mTimeText = new wxTextCtrl(this,1008,wxT("5.0"),wxDefaultPosition,wxSize(40,20),wxTE_RIGHT);//,wxTE_PROCESS_ENTER | wxTE_RIGHT);
+    mTimeText = new wxTextCtrl(this,1008,wxT("5.0"),wxDefaultPosition,wxSize(10,20),wxTE_RICH, wxDefaultValidator,wxTextCtrlNameStr);//,wxTE_PROCESS_ENTER | wxTE_RIGHT);
     timeSizer->Add( mTimeText,2,wxALL,1 );
     timeSizer->Add(new wxButton(this, button_UpdateTime, wxT("Set T(s)")),2,wxALL,1);
     executeBoxSizer->Add(timeSizer,1,wxALL,2);
@@ -446,8 +454,12 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
         mPredTimeText->GetValue().ToDouble(&ptime);
         mNodesText->GetValue().ToDouble(&tnodes);
         
+        Predictor *predictor;
+        if(ptype == 0){ predictor = new LinearPredictor();} 
+        else{ predictor = new QuadraticPredictor();} 
+        
         for(it=0; it < maxiterations; it++){
-                thrower.throwObject(robotPos, noise, ptime, ptype, tnodes, CLOSEST_RRT);
+                thrower.throwObject(robotPos, noise, ptime, *predictor, tnodes, mApproach);
                 stop_count = (thrower.SetThrowTimeline(true) < STOP_THRESHOLD) ? stop_count+1 : stop_count;
         }
         /*TEST OUTPUTS*/
@@ -520,6 +532,11 @@ void RipPlannerTab::OnCheckBox( wxCommandEvent &evt ) {
     mSmooth = (bool)evt.GetSelection();
     std::cout << "(i) Smooth option = " << mSmooth << std::endl;
     break;
+  case checkbox_useMultiGoal:
+    mApproach = (bool)evt.GetSelection();
+    std::cout << "(i) Multi-Goal option = " << mApproach << std::endl;
+    break;
+    
   }
 }
 

@@ -38,6 +38,7 @@ public:
     bool mGreedyMode;
     bool mConnectMode;
     bool mSmooth;
+    bool mApproach;
     PathPlanner *mPlanner;
 
     wxTextCtrl *mTimeText;

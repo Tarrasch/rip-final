@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Eigen;
 
-QuadraticPredictor::QuadraticPredictor(Path observedPath, double time){
+Path QuadraticPredictor::getPredictedPath(Path observedPath, double time){
 		// Terminate if the path size is zero elements
 		assert(observedPath.size() > 0);
 		
@@ -57,8 +57,6 @@ QuadraticPredictor::QuadraticPredictor(Path observedPath, double time){
 		
 		//call projectileMotionWRandT with no randomness
 		predictedPath = projectileMotionWRandT(p3, v2, acc, 0, time);
+		return predictedPath;
 }
 
-Path QuadraticPredictor::getPredictedPath(){
-        return predictedPath;
-}

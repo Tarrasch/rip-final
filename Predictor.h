@@ -18,7 +18,7 @@ class Predictor {
 
 public:
 
-    virtual Path getPredictedPath() = 0;
+    virtual Path getPredictedPath(Path observedPath, double time) = 0;
     virtual ~Predictor(){};
 };
 

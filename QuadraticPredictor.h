@@ -20,8 +20,7 @@ class QuadraticPredictor : public Predictor {
 private:
     Path predictedPath;
 public:
-    QuadraticPredictor(Path observedPath, double time);
-    virtual Path getPredictedPath();
+    virtual Path getPredictedPath(Path observedPath, double time);
     virtual ~QuadraticPredictor(){};
 };
 

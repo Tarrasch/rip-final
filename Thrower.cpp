@@ -69,7 +69,7 @@ VectorXd findRandomStartPosition(VectorXd pos){
 }
 
 // The effect of this method is that it will fill the path value
-void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, double prediction_type, double maxnodes, bool approach) {
+void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, Predictor &predictor, double maxnodes, bool approach) {
   
   //make sure objects are in start locations to allow RRT to run multiple times
   mSphereActual.setPositionXYZ(0, 3, 1);
@@ -110,8 +110,8 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, do
   for(Path::iterator it = perceivedPath.begin(); it != perceivedPath.end(); it++){
     Path::iterator it_after = it;
     it_after++;
-    QuadraticPredictor predictor(Path(perceivedPath.begin(), it_after), prediction_time);
-    predictedPaths.push_back(predictor.getPredictedPath());
+
+    predictedPaths.push_back(predictor.getPredictedPath(Path(perceivedPath.begin(), it_after), prediction_time));
     predictedPath.push_back(predictedPaths.back().back());
   }
   
@@ -139,8 +139,7 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, do
       }
     }
 
-    bool multiGoalStrategy = false;
-    if(multiGoalStrategy) {
+    if(approach) {
       bool greedy = true;
       PathPlanner planner(mWorld, false, jointSpeeds*dt);
       int res = planner.planMultiGoalRrt(mRobotId, links, joints, qReachables, greedy, 5000);

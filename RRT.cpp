@@ -189,7 +189,6 @@ void RRT::tracePath( int _node,
                      bool _reverse ) {
 
     int x = _node;
-
     while( x != -1 ) {
       if( !_reverse ) {
 	_path.push_front( configVector[x] );
@@ -198,6 +197,7 @@ void RRT::tracePath( int _node,
       }
       x = parentVector[x];
     }
+    
 }
 
 /**

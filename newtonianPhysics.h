@@ -14,7 +14,7 @@ typedef vector<VectorXd> Path;
 
 const double g = (-9.82/10.0);
 const double pg = -g;
-const double PI = 3.1415925;
+//const double PI = 3.1415925;
 const double dt = 0.05;
 const double theta = 45.0;
 

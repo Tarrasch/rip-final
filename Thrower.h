@@ -14,8 +14,9 @@
 #include <kinematics/Marker.h> 
 #include <wx/wx.h>
 #include "newtonianPhysics.h"
-#define CLOSEST_RRT true
-#define MULTI_RRT false
+#include "Predictor.h"
+#define CLOSEST_RRT false
+#define MULTI_RRT true
 
 using namespace std;
 using namespace Eigen;
@@ -45,7 +46,7 @@ public:
     Thrower(robotics::World &_world, wxTextCtrl *_timeText,
         robotics::Object &_sphereActual, robotics::Object &_spherePerceived, robotics::Object &_spherePredicted, robotics::Object &_aimStar);
 
-    void throwObject(VectorXd pos, double noise, double prediction_time, double prediction_type, double maxnodes, bool approach);
+    void throwObject(VectorXd pos, double noise, double prediction_time, Predictor &predictor, double maxnodes, bool approach);
     double SetThrowTimeline(bool addFrames);
 };
 #endif

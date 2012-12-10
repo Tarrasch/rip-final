@@ -269,7 +269,6 @@ int PathPlanner::planMultiGoalRrt( int _robotId,
   /// Save path
   printf(" --> Reached goal! : Gap: %.3f \n", rrt.getGap( _goals[closest] ) );
   rrt.tracePath( rrt.activeNode, path, false );
-
   return closest;
 }
 

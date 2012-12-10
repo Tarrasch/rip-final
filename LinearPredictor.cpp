@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Eigen;
 
-LinearPredictor::LinearPredictor(Path observedPath, double time){
+Path LinearPredictor::getPredictedPath(Path observedPath, double time){
 	int pathSize = observedPath.size();
 	
 	// Only continue if the observed path is greater than 0
@@ -74,8 +74,6 @@ LinearPredictor::LinearPredictor(Path observedPath, double time){
 	VectorXd acc(3); acc<<0,0,0;
 
 	predictedPath = projectileMotionWRandT(p2, vel, acc, 0, time);
+	return predictedPath;
 }
 
-Path LinearPredictor::getPredictedPath(){
-        return predictedPath;
-}

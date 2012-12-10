@@ -20,8 +20,7 @@ class LinearPredictor : public Predictor {
 private:
     Path predictedPath;
 public:
-    LinearPredictor(Path observedPath, double time);
-    virtual Path getPredictedPath();
+    virtual Path getPredictedPath(Path observedPath, double time);
     virtual ~LinearPredictor(){};
 };
 
