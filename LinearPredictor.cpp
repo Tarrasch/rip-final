@@ -21,9 +21,9 @@ LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath, double
 	
 	// Grab the last point in the path
 	VectorXd p2(3);	// = observedPath.back();
-	p2 < 0,0,0;
+	p2 << 0,0,0;
 	VectorXd p1(3); //= *it;
-	p1 < 0,0,0;
+	p1 << 0,0,0;
 	
 	// Build an iterator over the path list
 	list<VectorXd>::iterator it = observedPath.end();
@@ -67,15 +67,10 @@ LinearPredictor::LinearPredictor(std::list<Eigen::VectorXd> observedPath, double
 		p1 = p1 * (2/pathSize);
 	}
 
-	//call projectileMotionWRandT with no randomness
-	if (pathSize == 1)
-	{
-		VectorXd vel = (p2 - p1)/dt;
-	}
-	else
-	{
-		VectorXd vel = (p2 - p1)/((pathSize-1)*dt);
-	}
+  VectorXd vel = pathSize == 1 ?
+                 (p2 - p1)/dt :
+                 (p2 - p1)/((pathSize-1)*dt);
+
 	VectorXd acc(3); acc<<0,0,0;
 
 	predictedPath = projectileMotionWRandT(p2, vel, acc, 0, time);
