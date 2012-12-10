@@ -7,9 +7,9 @@
 #define PRINT(x) std::cout << #x << " = " << x << std::endl;
 #define ECHO(x) std::cout << x << std::endl;
 
-std::list< VectorXd > projectileMotion(VectorXd pos, VectorXd vel, VectorXd acc){
+Path projectileMotion(VectorXd pos, VectorXd vel, VectorXd acc){
         //ECHO("START Projectile Motion");
-        std::list<VectorXd> res;
+        Path res;
         do {
                 res.push_back(pos);
                 pos += vel*dt + acc*pow(dt,2)/2.0;
@@ -21,14 +21,14 @@ std::list< VectorXd > projectileMotion(VectorXd pos, VectorXd vel, VectorXd acc)
 }
 
 
-std::list< VectorXd > projectileMotionWRand(VectorXd pos, VectorXd vel, VectorXd acc, int randMaxAcc){
+Path projectileMotionWRand(VectorXd pos, VectorXd vel, VectorXd acc, int randMaxAcc){
 	//ECHO("START Random Projectile Motion"); 
 	
 	// initialize random seed
 	srand ( time(NULL) );					
 
 	// Build a list of VectorXds for the final path
-	std::list<VectorXd> res;				
+	Path res;				
 	do {
 		// Push the current position to the final path list
 		res.push_back(pos);
@@ -55,14 +55,14 @@ std::list< VectorXd > projectileMotionWRand(VectorXd pos, VectorXd vel, VectorXd
 	return res;
 }
 
-std::list< VectorXd > straightMotion(VectorXd startpos, VectorXd endpos){
+Path straightMotion(VectorXd startpos, VectorXd endpos){
         //ECHO("START Straight Motion");
         double t = 1;
         VectorXd dir = endpos - startpos;
         double distance = dir.norm();
         VectorXd vel = dir*(1/t);
  
-        std::list<VectorXd> res;
+        Path res;
         VectorXd pos = startpos;
         do {
                 res.push_back(pos);
@@ -73,14 +73,14 @@ std::list< VectorXd > straightMotion(VectorXd startpos, VectorXd endpos){
         return res;
 }
 
-std::list< VectorXd > projectileMotionWRandT(VectorXd pos, VectorXd vel, VectorXd acc, int randMaxAcc, double maxTime){
+Path projectileMotionWRandT(VectorXd pos, VectorXd vel, VectorXd acc, int randMaxAcc, double maxTime){
 	//ECHO("START Random Projectile Motion with Time"); 
 	
 	// initialize random seed
 	srand ( time(NULL) );					
 
 	// Build a list of VectorXds for the final path
-	std::list<VectorXd> res;		
+	Path res;		
 
 	// Build a counter to calculate the amount of "time" that has passed
 	double t = 0;

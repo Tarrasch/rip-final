@@ -82,10 +82,12 @@ class JointMover {
     // Returns the workspace coordinate for a jointspace coordinate
     VectorXd GetXYZ( VectorXd _q );
 
-    static double jointSpaceDistance(VectorXd _q1, VectorXd _q2);
-    static VectorXd jointSpaceMovement(VectorXd _qStart, VectorXd _qGoal);
+
 
 };
+
+double jointSpaceDistance(VectorXd _q1, VectorXd _q2);
+VectorXd jointSpaceMovement(VectorXd _qStart, VectorXd _qGoal);
 
 #endif
 

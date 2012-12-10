@@ -13,13 +13,13 @@
 using namespace std;
 using namespace Eigen;
 
-QuadraticPredictor::QuadraticPredictor(std::list<Eigen::VectorXd> observedPath, double time){
+QuadraticPredictor::QuadraticPredictor(Path observedPath, double time){
 		// Terminate if the path size is zero elements
 		assert(observedPath.size() > 0);
 		
 		// Build an iterator over the entire path. Start at the "end" of the path. 
 		//Note: this "end" node doesn't actually contain the end of the path but a special node that is 1 past the true end
-		list<VectorXd>::iterator it = observedPath.end();
+		Path::iterator it = observedPath.end();
 		
 		// Decrement the iterator and grab the end node
 		it--;
@@ -59,6 +59,6 @@ QuadraticPredictor::QuadraticPredictor(std::list<Eigen::VectorXd> observedPath, 
 		predictedPath = projectileMotionWRandT(p3, v2, acc, 0, time);
 }
 
-std::list<Eigen::VectorXd> QuadraticPredictor::getPredictedPath(){
+Path QuadraticPredictor::getPredictedPath(){
         return predictedPath;
 }

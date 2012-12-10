@@ -96,12 +96,12 @@ VectorXd JointMover::GetXYZ( VectorXd _q ) {
   return qXYZ;
 }
 
-static double JointMover::jointSpaceDistance(VectorXd _q1, VectorXd _q2) {
+double jointSpaceDistance(VectorXd _q1, VectorXd _q2) {
   // This is the infinite norm
   return (_q2-_q1).cwiseAbs().maxCoeff();
 }
 
-static VectorXd JointMover::jointSpaceMovement(VectorXd _qStart, VectorXd _qGoal) {
+VectorXd jointSpaceMovement(VectorXd _qStart, VectorXd _qGoal) {
   VectorXd diff = (_qGoal-_qStart);
   for(int i = 0; i < diff.size(); i++){
     diff[i] = max(-jointSpeeds*dt, min(jointSpeeds*dt, diff[i]));

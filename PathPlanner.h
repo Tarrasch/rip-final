@@ -21,6 +21,9 @@
 #include <float.h>
 #include "RRT.h"
 
+using namespace std;
+using namespace Eigen;
+
 /**
  * @class PathPlanner
  * @brief Basic Planner RRT-based
@@ -75,6 +78,13 @@ class PathPlanner {
     void shortenAndSmoothPath( int _robotId,
                      const Eigen::VectorXi &_links,
                      std::list<Eigen::VectorXd> &_path );
+
+    int  planMultiGoalRrt( int _robotId,
+                           const Eigen::VectorXi &_links,
+                           const Eigen::VectorXd &_start,
+                           const vector<Eigen::VectorXd> &_goals,
+                           bool _greedy,
+                           unsigned int _maxNodes );
 
 
 private:

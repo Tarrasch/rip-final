@@ -18,10 +18,10 @@ using namespace Eigen;
 class QuadraticPredictor : public Predictor {
 
 private:
-    std::list<Eigen::VectorXd> predictedPath;
+    Path predictedPath;
 public:
-    QuadraticPredictor(std::list<Eigen::VectorXd> observedPath, double time);
-    virtual std::list<Eigen::VectorXd> getPredictedPath();
+    QuadraticPredictor(Path observedPath, double time);
+    virtual Path getPredictedPath();
     virtual ~QuadraticPredictor(){};
 };
 

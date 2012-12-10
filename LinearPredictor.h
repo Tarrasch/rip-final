@@ -18,10 +18,10 @@ using namespace Eigen;
 class LinearPredictor : public Predictor {
 
 private:
-    std::list<Eigen::VectorXd> predictedPath;
+    Path predictedPath;
 public:
-    LinearPredictor(std::list<Eigen::VectorXd> observedPath, double time);
-    virtual std::list<Eigen::VectorXd> getPredictedPath();
+    LinearPredictor(Path observedPath, double time);
+    virtual Path getPredictedPath();
     virtual ~LinearPredictor(){};
 };
 

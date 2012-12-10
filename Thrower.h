@@ -13,6 +13,7 @@
 #include <kinematics/BodyNode.h> 
 #include <kinematics/Marker.h> 
 #include <wx/wx.h>
+#include "newtonianPhysics.h"
 #define CLOSEST_RRT true
 #define MULTI_RRT false
 
@@ -22,7 +23,6 @@ using namespace Eigen;
 class Thrower {
 
 public:
-    typedef list<VectorXd> Path;
     const int mRobotId;
 
     /// Member variables
@@ -37,7 +37,7 @@ public:
 
     Path objectPath;
     Path perceivedPath; 
-    list<VectorXd> aims;
+    Path aims;
     Path predictedPath;
     list< Path > predictedPaths;
     Path jointPath; 
