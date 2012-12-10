@@ -24,4 +24,6 @@ Path straightMotion(VectorXd start, VectorXd endpos);
 
 Path projectileMotionWRandT(VectorXd pos, VectorXd vel, VectorXd acc, int randMaxAcc, double maxTime);
 Path projectileMotionWRand(VectorXd pos, VectorXd vel, VectorXd acc, int randMaxAcc);
+
+VectorXd sum(Path::iterator b, Path::iterator e);
 #endif

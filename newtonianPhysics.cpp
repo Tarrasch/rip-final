@@ -132,3 +132,11 @@ VectorXd calculateVelocities(VectorXd startpos, VectorXd endpos){
         return vel;
 }
 
+VectorXd sum(Path::iterator b, Path::iterator e) {
+  assert(b!=e);
+  VectorXd start = *(b++);
+  while(b!=e){ start += *(b++); }
+  return start;
+}
+
+

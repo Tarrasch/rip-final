@@ -14,49 +14,22 @@ using namespace std;
 using namespace Eigen;
 
 Path QuadraticPredictor::getPredictedPath(Path observedPath, double time){
-		// Terminate if the path size is zero elements
-		assert(observedPath.size() > 0);
-		
-		// Build an iterator over the entire path. Start at the "end" of the path. 
-		//Note: this "end" node doesn't actually contain the end of the path but a special node that is 1 past the true end
-		Path::iterator it = observedPath.end();
-		
-		// Decrement the iterator and grab the end node
-		it--;
-		VectorXd p3 = *it;
-		
-		// Check to make sure we aren't at the beginning now (ie, 1 node paths). If not decremenet the iterator
-		if(it != observedPath.begin()) { 
-			it--;
-		}
-		
-		// Grab the second to end node
-		VectorXd p2 = *it;
-		
-		// Check to make sure we aren't at the beginning now (ie, 2 node paths). If not decremenet the iterator
-		if(it != observedPath.begin()) { 
-			it--;
-		}
-		
-		// Grab the third to end node
-		VectorXd p1 = *it;
-		
-		/*Debug the three points
-		PRINT(p1);
-		PRINT(p2);
-		PRINT(p3);*/
-		
-		VectorXd v1 = (p2-p1)*1/dt;
-		VectorXd v2 = (p3-p2)*1/dt;
-		VectorXd acc = (observedPath.size() > 2) * (v2-v1)*1/dt;
-		
-		
-		/*PRINT(v1);
-		PRINT(v2);
-		PRINT(acc);*/
-		
-		//call projectileMotionWRandT with no randomness
-		predictedPath = projectileMotionWRandT(p3, v2, acc, 0, time);
-		return predictedPath;
+	// Only continue if the observed path is greater than 0
+	int n = observedPath.size();
+	assert(n > 0);
+	const int m = min(5,(n/3));
+
+	VectorXd vel(3); vel<<0,0,0;
+	VectorXd acc(3); acc<<0,0,0;
+  if(n >= 3*m){
+    VectorXd b0Last = sum(observedPath.end()-m, observedPath.end())*(1.0/m);
+    VectorXd b1Last = sum(observedPath.end()-(2*m), observedPath.end()-m)*(1.0/m);
+    VectorXd b2Last = sum(observedPath.end()-(3*m), observedPath.end()-(2*m))*(1.0/m);
+    VectorXd vel1 = (b0Last - b1Last)*(1.0/(dt*m));
+    VectorXd vel2 = (b1Last - b2Last)*(1.0/(dt*m));
+    VectorXd acc = (vel1 - vel2)*(1.0/dt);
+    vel = vel1;
+  }
+	return projectileMotionWRandT(observedPath.back(), vel, acc, 0, time);
 }
 
