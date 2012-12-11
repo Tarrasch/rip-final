@@ -455,8 +455,8 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
         mNodesText->GetValue().ToDouble(&tnodes);
         
         Predictor *predictor;
-        if(ptype == 0){ predictor = new LinearPredictor();} 
-        else{ predictor = new QuadraticPredictor();} 
+        if(ptype == 0){ ECHO("---Using Linear Predictor!---"); predictor = new LinearPredictor();} 
+        else{  ECHO("---Using Quadratic Predictor!---"); predictor = new QuadraticPredictor();} 
         
         double begin = clock();
         for(it=0; it < maxiterations; it++){
@@ -470,8 +470,8 @@ void RipPlannerTab::OnButton(wxCommandEvent &evt) {
         PRINT(maxiterations);
         double percentage = (stop_count/maxiterations)*100.0;
         PRINT(percentage);
-        ECHO("***ELAPSED TIME***");
-        double elapsed = (clock()-begin);
+        ECHO("***AVG. ELAPSED TIME***");
+        double elapsed = (clock()-begin)/maxiterations;
         PRINT(elapsed);
         
     } else {

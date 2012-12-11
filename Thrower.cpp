@@ -71,8 +71,9 @@ VectorXd findRandomStartPosition(VectorXd pos){
 
 // The effect of this method is that it will fill the path value
 void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, Predictor &predictor, double maxnodes, bool approach) {
+  VectorXd robotDefault(7); robotDefault << 0, 0, 0, 0, 0, 0, 0;
   
-  //make sure objects are in start locations to allow RRT to run multiple times
+  //make sure objects/robots are in start locations to allow RRT to run multiple times
   mSphereActual.setPositionXYZ(0, 3, 1);
   mSphereActual.update();
   mSpherePerceived.setPositionXYZ(0, 4, 1);
@@ -81,7 +82,8 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, Pr
   mSpherePredicted.update();
   mAimStar.setPositionXYZ(0, 6, 1);
   mAimStar.update();
-  
+  mWorld.getRobot(mRobotId)->setQuickDofs(robotDefault);
+  mWorld.getRobot(mRobotId)->update();
   
   //get random reachable position (rrp) for ball's projectile motion
   VectorXd rrp = findRandomReachablePosition(pos);
@@ -99,7 +101,7 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, Pr
   VectorXd acc(3); acc<< 0,0,g;
   
   //calculate motion in steps
-  objectPath = projectileMotion(rstart, vels, acc);
+  objectPath = projectileMotionWRand(rstart, vels, acc, 2);
   perceivedPath = addSensorNoise(objectPath, noise);
   //objectPath = straightMotion(rstart, rrp);
   
@@ -141,6 +143,7 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, Pr
         }
       }
     }
+    //Multi-Goal RRT to all reachable locations
     if(approach) {
       VectorXd aimXYZ = path.back();
       if(accumulate(valid.begin(), valid.end(), 0) > 0){
@@ -153,6 +156,7 @@ void Thrower::throwObject(VectorXd pos, double noise, double prediction_time, Pr
       }
        aims.push_back(aimXYZ);
     }
+    //regular RRT to best determined location
     else{
       VectorXd closestXYZ = path.back();
       VectorXd qClosest(7);
